@@ -39,3 +39,7 @@ config.json
 *.swp
 .DS_Store
 
+# Keep small deterministic STEP fixtures used by the test suite.
+!tests/fixtures/**/*.step
+!tests/fixtures/**/*.stp
+

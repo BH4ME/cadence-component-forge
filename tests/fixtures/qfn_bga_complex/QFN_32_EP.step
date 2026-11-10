@@ -1,0 +1,9 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('jlc2cadence QFN complex placeholder'),'2;1');
+FILE_NAME('QFN_32_EP.step','2026-07-31T00:00:00',('jlc2cadence'),('local'),'','','');
+FILE_SCHEMA(('AUTOMOTIVE_DESIGN_CC2'));
+ENDSEC;
+DATA;
+ENDSEC;
+END-ISO-10303-21;

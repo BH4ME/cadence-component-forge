@@ -13,6 +13,7 @@ dependencies = ["easyeda2kicad==1.0.1", "svgelements==1.9.6"]
 
 [project.optional-dependencies]
 desktop = ["cryptography==50.0.2", "cadquery-ocp-novtk==7.8.1.1.post1"]
+test = ["cryptography==50.0.2"]
 
 [project.scripts]
 jlc2cadence = "jlc2cadence.cli:main"

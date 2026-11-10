@@ -1,0 +1,9 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('Synthetic placeholder STEP for jlc2cadence alias tests'),'2;1');
+FILE_NAME('vendor-weird-name.step','2026-08-03T00:00:00',('jlc2cadence'),('jlc2cadence'),'','', '');
+FILE_SCHEMA(('AUTOMOTIVE_DESIGN_CC2'));
+ENDSEC;
+DATA;
+ENDSEC;
+END-ISO-10303-21;

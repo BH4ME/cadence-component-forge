@@ -1,0 +1,10 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('Synthetic STEP placeholder for hidden power fixture'),'2;1');
+FILE_NAME('SOT_23_5.step','2026-08-01T00:00:00',('jlc2cadence'),('jlc2cadence'),'','','');
+FILE_SCHEMA(('AP214'));
+ENDSEC;
+DATA;
+#1=PRODUCT('SOT_23_5','SOT_23_5','Synthetic SOT-23-5 package',());
+ENDSEC;
+END-ISO-10303-21;

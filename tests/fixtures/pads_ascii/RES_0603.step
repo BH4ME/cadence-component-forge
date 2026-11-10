@@ -1,0 +1,9 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('jlc2cadence PADS demo placeholder'),'2;1');
+FILE_NAME('RES_0603.step','2026-07-31T00:00:00',('jlc2cadence'),('local'),'','','');
+FILE_SCHEMA(('AP214'));
+ENDSEC;
+DATA;
+ENDSEC;
+END-ISO-10303-21;

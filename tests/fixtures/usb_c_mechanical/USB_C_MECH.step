@@ -1,0 +1,9 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('jlc2cadence usb-c mechanical placeholder'),'2;1');
+FILE_NAME('USB_C_MECH.step','2026-08-01T00:00:00',('jlc2cadence'),('local'),'','','');
+FILE_SCHEMA(('AP214'));
+ENDSEC;
+DATA;
+ENDSEC;
+END-ISO-10303-21;
