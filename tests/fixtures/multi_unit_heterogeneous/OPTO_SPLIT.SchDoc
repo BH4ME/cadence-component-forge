@@ -1,0 +1,7 @@
+|RECORD=Component|DesignItemID=U_OPTO_SPLIT|Designator=U?|Footprint=DIP_6|Comment=Split optocoupler|Description=Heterogeneous two-section optocoupler symbol|
+|RECORD=Pin|PinNumber=1|PinName=ANODE|PinType=Input|Unit=A|Orientation=0|
+|RECORD=Pin|PinNumber=2|PinName=CATHODE|PinType=Passive|Unit=A|Orientation=180|
+|RECORD=Pin|PinNumber=3|PinName=EMITTER|PinType=Passive|Unit=B|Orientation=180|
+|RECORD=Pin|PinNumber=4|PinName=COLLECTOR|PinType=Passive|Unit=B|Orientation=0|
+|RECORD=Pin|PinNumber=5|PinName=BASE|PinType=Input|Unit=B|Orientation=0|
+|RECORD=Pin|PinNumber=6|PinName=NC|PinType=NoConnect|Unit=B|Orientation=180|

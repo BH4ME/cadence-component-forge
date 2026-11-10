@@ -1,0 +1,25 @@
+{"type":"DOCHEAD","ticket":1}||{"docType":"FOOTPRINT","uuid":"fp-pro-sot23"}|
+{"type":"CANVAS","ticket":1,"id":"CANVAS"}||{"unit":"mm"}|
+{"type":"META","ticket":2,"id":"META"}||{"title":"SOT_23_3_PRO","description":"Synthetic EasyEDA Pro V3 footprint"}|
+{"type":"PAD","ticket":3,"id":"pad1"}||{"layerId":1,"num":"1","centerX":-37.402,"centerY":-37.402,"padAngle":0,"hole":null,"defaultPad":{"padType":"RECT","width":23.622,"height":35.433},"specialPad":[],"plated":true,"padType":"NORMAL"}|
+{"type":"PAD","ticket":4,"id":"pad2"}||{"layerId":1,"num":"2","centerX":37.402,"centerY":-37.402,"padAngle":0,"hole":null,"defaultPad":{"padType":"RECT","width":23.622,"height":35.433},"specialPad":[],"plated":true,"padType":"NORMAL"}|
+{"type":"PAD","ticket":5,"id":"pad3"}||{"layerId":1,"num":"3","centerX":0,"centerY":37.402,"padAngle":0,"hole":null,"defaultPad":{"padType":"ROUND","width":23.622,"height":23.622},"specialPad":[],"plated":true,"padType":"NORMAL"}|
+{"type":"PAD","ticket":6,"id":"npth1"}||{"layerId":12,"num":"NPTH1","centerX":0,"centerY":0,"padAngle":0,"hole":{"holeType":"ROUND","width":31.496,"height":31.496},"defaultPad":{"padType":"ROUND","width":31.496,"height":31.496},"specialPad":[],"plated":false,"padType":"NORMAL"}|
+{"type":"POLY","ticket":7,"id":"silk1"}||{"layerId":3,"width":5,"path":[-55,-55,"L",55,-55,"L",55,55,"L",-55,55,"L",-55,-55],"polyType":"NORMAL"}|
+{"type":"DOCHEAD","ticket":8}||{"docType":"SYMBOL","uuid":"sym-pro-device"}|
+{"type":"META","ticket":9,"id":"META"}||{"title":"PRO_DEVICE_SYMBOL","description":"Synthetic EasyEDA Pro V3 symbol"}|
+{"type":"PART","ticket":10,"id":"unit-a"}||{"title":"A"}|
+{"type":"PIN","ticket":11,"id":"pin1"}||{"partId":"unit-a","display":true,"electric":1,"x":-100,"y":0,"length":30,"rotation":0}|
+{"type":"ATTR","ticket":12,"id":"pin1-name"}||{"parentId":"pin1","key":"Pin Name","value":"IN"}|
+{"type":"ATTR","ticket":13,"id":"pin1-number"}||{"parentId":"pin1","key":"Pin Number","value":"1"}|
+{"type":"ATTR","ticket":14,"id":"pin1-type"}||{"parentId":"pin1","key":"Pin Type","value":"Input"}|
+{"type":"PIN","ticket":15,"id":"pin2"}||{"partId":"unit-a","display":true,"electric":2,"x":100,"y":0,"length":30,"rotation":180}|
+{"type":"ATTR","ticket":16,"id":"pin2-name"}||{"parentId":"pin2","key":"Pin Name","value":"OUT"}|
+{"type":"ATTR","ticket":17,"id":"pin2-number"}||{"parentId":"pin2","key":"Pin Number","value":"2"}|
+{"type":"ATTR","ticket":18,"id":"pin2-type"}||{"parentId":"pin2","key":"Pin Type","value":"Output"}|
+{"type":"PIN","ticket":19,"id":"pin3"}||{"partId":"unit-a","display":false,"electric":0,"x":0,"y":100,"length":30,"rotation":270}|
+{"type":"ATTR","ticket":20,"id":"pin3-name"}||{"parentId":"pin3","key":"Pin Name","value":"VCC"}|
+{"type":"ATTR","ticket":21,"id":"pin3-number"}||{"parentId":"pin3","key":"Pin Number","value":"3"}|
+{"type":"ATTR","ticket":22,"id":"pin3-type"}||{"parentId":"pin3","key":"Pin Type","value":"Power"}|
+{"type":"DOCHEAD","ticket":23}||{"docType":"DEVICE","uuid":"dev-pro-device"}|
+{"type":"META","ticket":24,"id":"META"}||{"title":"PRO_DEVICE","description":"Synthetic EasyEDA Pro V3 device","attributes":{"Name":"PRO_DEVICE","Designator":"U?","Value":"pro-value","Symbol":"sym-pro-device","Footprint":"fp-pro-sot23","3D Model":"model-pro","3D Model Title":"SOT_23_3_PRO","3D Model Transform":"118.11,70.866,0,90,0,0,0.1,-0.2,0.3","Manufacturer Part":"PRO_DEVICE_MP","Supplier Part":"C000001"}}|

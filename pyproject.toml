@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jlc2cadence"
+version = "0.47.0"
+description = "Capture component browser and JLC-to-Cadence library converter."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Local Codex Project" }]
+dependencies = ["easyeda2kicad==1.0.1", "svgelements==1.9.6"]
+
+[project.optional-dependencies]
+desktop = ["cryptography==50.0.2", "cadquery-ocp-novtk==7.8.1.1.post1"]
+
+[project.scripts]
+jlc2cadence = "jlc2cadence.cli:main"
+jlc2capture = "jlc2cadence.capture_bridge:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,15 @@
+{
+  "name": "jlc2capture-panel",
+  "version": "0.47.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test test_panel.mjs"
+  },
+  "dependencies": {
+    "lucide": "0.100.0",
+    "three": "0.136.0"
+  },
+  "devDependencies": {
+    "acorn": "8.14.1"
+  }
+}

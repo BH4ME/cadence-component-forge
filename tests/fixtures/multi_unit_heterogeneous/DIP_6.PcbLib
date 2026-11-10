@@ -1,0 +1,11 @@
+|RECORD=Component|Pattern=DIP_6|Description=6-pin dual inline package|
+|RECORD=Pad|Designator=1|X=-3.81mm|Y=2.54mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Pad|Designator=2|X=-3.81mm|Y=0mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Pad|Designator=3|X=-3.81mm|Y=-2.54mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Pad|Designator=4|X=3.81mm|Y=-2.54mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Pad|Designator=5|X=3.81mm|Y=0mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Pad|Designator=6|X=3.81mm|Y=2.54mm|XSize=1.5mm|YSize=1.5mm|HoleSize=0.8mm|Layer=Multi-Layer|Shape=Round|Plated=true|
+|RECORD=Line|Layer=TopOverlay|X1=-4.8mm|Y1=3.6mm|X2=4.8mm|Y2=3.6mm|Width=0.15mm|
+|RECORD=Line|Layer=TopOverlay|X1=4.8mm|Y1=3.6mm|X2=4.8mm|Y2=-3.6mm|Width=0.15mm|
+|RECORD=Line|Layer=TopOverlay|X1=4.8mm|Y1=-3.6mm|X2=-4.8mm|Y2=-3.6mm|Width=0.15mm|
+|RECORD=Line|Layer=TopOverlay|X1=-4.8mm|Y1=-3.6mm|X2=-4.8mm|Y2=3.6mm|Width=0.15mm|

@@ -1,0 +1,4 @@
+|RECORD=Component|DesignItemID=R_DEMO|Designator=R?|Comment=10k|Footprint=RES_0603|Description=Demo resistor|
+|RECORD=Pin|PinNumber=1|PinName=1|PinType=Passive|X=0mm|Y=0mm|Orientation=180|Length=2.54mm|
+|RECORD=Pin|PinNumber=2|PinName=2|PinType=Passive|X=10mm|Y=0mm|Orientation=0|Length=2.54mm|
+

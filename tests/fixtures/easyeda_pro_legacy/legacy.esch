@@ -1,0 +1,8 @@
+["DOCTYPE","SCH","1.1"]
+["HEAD",{"originX":0,"originY":0,"version":"2","maxId":20}]
+["COMPONENT","c1","LEGACY_TEST_IC.1",100,100,0,0,{},0]
+["ATTR","a1","c1","Device","dev123",0,0,null,null,0,"st1",0]
+["ATTR","a2","c1","Symbol","sym123",0,0,null,null,0,"st1",0]
+["ATTR","a3","c1","Designator","U1",0,0,null,null,0,"st1",0]
+["ATTR","a4","c1","Name","={Value}",0,0,null,null,0,"st1",0]
+["ATTR","a5","c1","Value","legacy-value",0,0,null,null,0,"st1",0]

@@ -1,0 +1,17 @@
+|RECORD=Component|DesignItemID=U_74LS183|Designator=U?|Footprint=DIP_14|Comment=74LS183|Description=Dual 1-bit full adder homogeneous units|
+|RECORD=Pin|PinNumber=1|PinName=A|PinType=Input|Unit=A|Orientation=0|
+|RECORD=Pin|PinNumber=3|PinName=B|PinType=Input|Unit=A|Orientation=0|
+|RECORD=Pin|PinNumber=4|PinName=CI|PinType=Input|Unit=A|Orientation=0|
+|RECORD=Pin|PinNumber=6|PinName=S|PinType=Output|Unit=A|Orientation=180|
+|RECORD=Pin|PinNumber=5|PinName=CO|PinType=Output|Unit=A|Orientation=180|
+|RECORD=Pin|PinNumber=14|PinName=VCC|PinType=Power|Unit=A|Orientation=90|
+|RECORD=Pin|PinNumber=7|PinName=GND|PinType=Power|Unit=A|Orientation=270|
+|RECORD=Pin|PinNumber=2|PinName=NC|PinType=NoConnect|Unit=A|Orientation=180|
+|RECORD=Pin|PinNumber=13|PinName=A|PinType=Input|Unit=B|Orientation=0|
+|RECORD=Pin|PinNumber=12|PinName=B|PinType=Input|Unit=B|Orientation=0|
+|RECORD=Pin|PinNumber=11|PinName=CI|PinType=Input|Unit=B|Orientation=0|
+|RECORD=Pin|PinNumber=8|PinName=S|PinType=Output|Unit=B|Orientation=180|
+|RECORD=Pin|PinNumber=10|PinName=CO|PinType=Output|Unit=B|Orientation=180|
+|RECORD=Pin|PinNumber=14|PinName=VCC|PinType=Power|Unit=B|Orientation=90|
+|RECORD=Pin|PinNumber=7|PinName=GND|PinType=Power|Unit=B|Orientation=270|
+|RECORD=Pin|PinNumber=9|PinName=NC|PinType=NoConnect|Unit=B|Orientation=180|

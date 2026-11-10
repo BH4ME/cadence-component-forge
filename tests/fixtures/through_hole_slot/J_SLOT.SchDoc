@@ -1,0 +1,3 @@
+|RECORD=Component|DesignItemID=J_SLOT|Designator=J?|Comment=Slot connector|Footprint=CONN_SLOT|Description=Demo connector|
+|RECORD=Pin|PinNumber=1|PinName=1|PinType=Passive|X=0mm|Y=0mm|Orientation=180|Length=2.54mm|
+|RECORD=Pin|PinNumber=2|PinName=2|PinType=Passive|X=8.0mm|Y=0mm|Orientation=0|Length=2.54mm|

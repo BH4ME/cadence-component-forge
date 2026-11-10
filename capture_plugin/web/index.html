@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JLC / LCSC</title>
+  <link rel="stylesheet" href="__PLUGIN_ASSETS__/panel.css">
+  <script>
+    window.addEventListener('error', function (event) {
+      var message = event.message || (event.target && event.target.src ? 'Script load failed: ' + event.target.src : 'Panel initialization failed');
+      function report() {
+        var status = document.getElementById('status'), connection = document.getElementById('connection'), reconnect = document.getElementById('reconnect');
+        if (status) { status.textContent = message; status.className = 'error'; }
+        if (connection) { connection.textContent = 'Capture \u672a\u8fde\u63a5'; }
+        if (reconnect) { reconnect.hidden = false; reconnect.disabled = false; }
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', report); } else { report(); }
+    }, true);
+  </script>
+  <!-- Global UMD libraries must load before Cadence's AMD loader. -->
+  <script src="__PLUGIN_ASSETS__/node_modules/lucide/dist/umd/lucide.min.js"></script>
+  <script src="__PLUGIN_ASSETS__/node_modules/three/build/three.min.js"></script>
+  <script src="__PLUGIN_ASSETS__/node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="__PLUGIN_ASSETS__/node_modules/three/examples/js/controls/OrbitControls.js"></script>
+  <script src="__PLUGIN_ASSETS__/node_modules/three/examples/js/renderers/Projector.js"></script>
+  <script src="__PLUGIN_ASSETS__/node_modules/three/examples/js/renderers/SVGRenderer.js"></script>
+  <script src="__CADENCE_ROOT__/share/orJSLibs/jQuery/jquery-2.1.1.min.js"></script>
+  <script src="__CADENCE_ROOT__/share/orJSLibs/dojo/dojo/dojo.js"></script>
+  <script src="__CADENCE_ROOT__/tools/capture/tclscripts/orPrmDesigner/API/OrDzFramework.js"></script>
+  <script defer src="__PLUGIN_ASSETS__/step_preview.js"></script>
+  <script defer src="__PLUGIN_ASSETS__/panel.js"></script>
+</head>
+<body>
+  <header><strong>JLC / LCSC</strong><span id="connection">&#27491;&#22312;&#36830;&#25509; Capture...</span><button id="updates" title="&#26816;&#26597;&#25193;&#23637;&#26356;&#26032;" aria-label="Check for extension updates" disabled><i data-lucide="download"></i></button><button id="reconnect" title="Reconnect Capture" aria-label="Reconnect Capture" hidden onclick="location.reload()"><i data-lucide="refresh-cw">&#8635;</i></button><button id="folder" title="Open library folder" aria-label="Open library folder" disabled><i data-lucide="folder-open"></i></button></header>
+  <form id="search-form"><label for="query">&#26009;&#21495; / &#22411;&#21495;</label><div class="search-row"><input id="query" maxlength="200" autocomplete="off" value="STM32F031F6P7TR"><button type="submit" id="search" disabled>&#25628;&#32034;</button></div></form>
+  <div class="filters"><select id="manufacturer" aria-label="Manufacturer"><option value="">&#20840;&#37096;&#21378;&#21830;</option></select><select id="package" aria-label="Package"><option value="">&#20840;&#37096;&#23553;&#35013;</option></select><label><input type="checkbox" id="in-stock">&#26377;&#24211;&#23384;</label></div>
+  <div class="table-wrap"><table><thead><tr><th>LCSC</th><th>&#22411;&#21495;</th><th>&#21378;&#21830;</th><th>&#23553;&#35013;</th><th>&#24211;&#23384;</th></tr></thead><tbody id="results"></tbody></table><div id="empty" hidden>&#26080;&#32467;&#26524;</div></div>
+  <nav class="paging"><span id="count">0</span><span class="page-buttons"><button id="previous" title="Previous page" disabled><i data-lucide="chevron-left"></i></button><span id="page">1</span><button id="next" title="Next page" disabled><i data-lucide="chevron-right"></i></button></span></nav>
+  <section class="details"><div><strong id="part-title">&#8212;</strong><span id="part-id"></span></div><p id="description"></p><dl><dt>&#21378;&#21830;</dt><dd id="part-manufacturer">&#8212;</dd><dt>&#23553;&#35013;</dt><dd id="part-package">&#8212;</dd><dt>STEP</dt><dd id="step-status">&#8212;</dd></dl></section>
+  <section class="previews"><div class="preview"><div class="preview-heading">&#31526;&#21495;<button data-fit="symbol" title="Enlarge symbol"><i data-lucide="maximize"></i></button></div><canvas id="symbol" aria-label="Symbol preview"></canvas></div><div class="preview"><div class="preview-heading">&#23553;&#35013;<button data-fit="footprint" title="Enlarge footprint"><i data-lucide="maximize"></i></button></div><canvas id="footprint" aria-label="Footprint preview"></canvas></div><div class="preview"><div class="preview-heading">3D<button id="view-step" title="Enlarge STEP model" disabled><i data-lucide="maximize"></i></button></div><div id="step-preview" hidden></div><span id="no-step">&#8212;</span></div></section>
+  <div class="actions"><button id="import" disabled>&#19979;&#36733;&#36164;&#28304;</button><button id="place" class="primary" disabled>&#25918;&#32622;&#21407;&#29702;&#22270;</button></div>
+  <footer><progress id="progress" hidden></progress><div id="status" role="status">&#27491;&#22312;&#36830;&#25509; Capture...</div><div id="library-root"></div></footer>
+  <div id="zoom" role="dialog" aria-modal="true" hidden><div class="zoom-heading"><strong id="zoom-title"></strong><button id="zoom-close" title="Close preview"><i data-lucide="x"></i></button></div><canvas id="zoom-canvas"></canvas></div>
+</body>
+</html>

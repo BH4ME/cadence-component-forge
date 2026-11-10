@@ -1,0 +1,31 @@
+{
+  "symbols": {
+    "sym123": {
+      "title": "LEGACY_TEST_IC",
+      "desc": "Legacy EasyEDA Pro symbol",
+      "type": 2
+    }
+  },
+  "footprints": {
+    "fp123": {
+      "title": "SOT_LEGACY_TEST",
+      "desc": "Legacy EasyEDA Pro footprint",
+      "type": 4
+    }
+  },
+  "devices": {
+    "dev123": {
+      "title": "LEGACY_TEST_IC",
+      "attributes": {
+        "Symbol": "sym123",
+        "Footprint": "fp123",
+        "Designator": "U?",
+        "Value": "legacy-value",
+        "3D Model": "model123",
+        "3D Model Title": "SOT_LEGACY_TEST",
+        "3D Model Transform": "118.11,70.866,0,90,0,0,0.1,-0.2,0.3"
+      },
+      "description": "Legacy EasyEDA Pro component"
+    }
+  }
+}

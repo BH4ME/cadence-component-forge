@@ -1,0 +1,17 @@
+{
+  "include_defaults": true,
+  "templates": {
+    "step": [
+      "https://example.invalid/models/{model_id_part}.step",
+      "https://example.invalid/lcsc/{component_lcsc_part}.step"
+    ],
+    "obj": [
+      "https://example.invalid/models/{model_id_part}.obj"
+    ]
+  },
+  "models": {
+    "C12345": {
+      "step": "https://example.invalid/lcsc/C12345.step"
+    }
+  }
+}

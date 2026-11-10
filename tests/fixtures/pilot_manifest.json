@@ -1,0 +1,130 @@
+{
+  "samples": [
+    {
+      "name": "demo_altium",
+      "input": "demo_altium",
+      "models": "demo_altium",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "through_hole_slot",
+      "input": "through_hole_slot",
+      "models": "through_hole_slot",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "pads_ascii",
+      "input": "pads_ascii",
+      "models": "pads_ascii",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "qfn_bga_complex",
+      "input": "qfn_bga_complex",
+      "models": "qfn_bga_complex",
+      "expected": {
+        "components": 2,
+        "footprints": 2,
+        "models": 2,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "multi_unit_homogeneous",
+      "input": "multi_unit_homogeneous",
+      "models": "multi_unit_homogeneous",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "multi_unit_heterogeneous",
+      "input": "multi_unit_heterogeneous",
+      "models": "multi_unit_heterogeneous",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "hidden_power",
+      "input": "hidden_power",
+      "models": "hidden_power",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "usb_c_mechanical",
+      "input": "usb_c_mechanical",
+      "models": "usb_c_mechanical",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    },
+    {
+      "name": "easyeda_pro_v3",
+      "input": "easyeda_pro_v3",
+      "models": "easyeda_pro_v3",
+      "expected": {
+        "components": 1,
+        "footprints": 1,
+        "models": 1,
+        "errors": 0,
+        "warnings": 0,
+        "step_errors": 0,
+        "step_warnings": 0
+      }
+    }
+  ]
+}

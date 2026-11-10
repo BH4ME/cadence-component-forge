@@ -1,0 +1,20 @@
+|RECORD=Component|Name=USB_C_MECH|Description=USB-C footprint with shield and NPTH mechanical pads|
+|RECORD=Pad|Designator=A1|X=-1.75mm|Y=-1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=A4|X=-0.75mm|Y=-1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=A5|X=-0.25mm|Y=-1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=A6|X=0.25mm|Y=-1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=A7|X=0.75mm|Y=-1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=B5|X=-0.25mm|Y=1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=BottomLayer|Shape=RoundedRectangle|Rotation=180|
+|RECORD=Pad|Designator=B6|X=0.25mm|Y=1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=BottomLayer|Shape=RoundedRectangle|Rotation=180|
+|RECORD=Pad|Designator=B7|X=0.75mm|Y=1.10mm|XSize=0.30mm|YSize=0.80mm|Layer=BottomLayer|Shape=RoundedRectangle|Rotation=180|
+|RECORD=Pad|Designator=SHELL1|X=-3.20mm|Y=-0.65mm|XSize=1.20mm|YSize=1.70mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|PadRole=Shield|
+|RECORD=Pad|Designator=SHELL2|X=3.20mm|Y=-0.65mm|XSize=1.20mm|YSize=1.70mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|PadRole=Shield|
+|RECORD=Pad|Designator=SHELL3|X=-3.20mm|Y=0.85mm|XSize=1.20mm|YSize=1.70mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|Shield=True|
+|RECORD=Pad|Designator=SHELL4|X=3.20mm|Y=0.85mm|XSize=1.20mm|YSize=1.70mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|Shield=True|
+|RECORD=Pad|Designator=NPTH1|X=-2.25mm|Y=0.00mm|XSize=0.70mm|YSize=0.70mm|HoleSize=0.70mm|Layer=MultiLayer|Shape=Circle|Rotation=0|HoleType=NPTH|Plated=False|
+|RECORD=Pad|Designator=NPTH2|X=2.25mm|Y=0.00mm|XSize=0.70mm|YSize=0.70mm|HoleSize=0.70mm|Layer=MultiLayer|Shape=Circle|Rotation=0|NPTH=True|Plated=False|
+|RECORD=Track|X1=-4.00mm|Y1=-1.85mm|X2=4.00mm|Y2=-1.85mm|Layer=TopOverlay|Width=0.10mm|
+|RECORD=Track|X1=4.00mm|Y1=-1.85mm|X2=4.00mm|Y2=1.85mm|Layer=TopOverlay|Width=0.10mm|
+|RECORD=Track|X1=4.00mm|Y1=1.85mm|X2=-4.00mm|Y2=1.85mm|Layer=TopOverlay|Width=0.10mm|
+|RECORD=Track|X1=-4.00mm|Y1=1.85mm|X2=-4.00mm|Y2=-1.85mm|Layer=TopOverlay|Width=0.10mm|
+|RECORD=Text|Text=A1|X=-2.20mm|Y=-2.05mm|Layer=TopOverlay|Rotation=0|

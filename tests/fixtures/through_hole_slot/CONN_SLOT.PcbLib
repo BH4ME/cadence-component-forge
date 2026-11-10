@@ -1,0 +1,7 @@
+|RECORD=Component|Name=CONN_SLOT|Description=Demo connector with through-hole and slot pads|
+|RECORD=Pad|Designator=1|X=-1.50mm|Y=0mm|XSize=1.80mm|YSize=1.80mm|HoleSize=0.80mm|Layer=MultiLayer|Shape=Circle|Rotation=0|Plated=True|
+|RECORD=Pad|Designator=2|X=1.50mm|Y=0mm|XSize=2.60mm|YSize=1.20mm|HoleType=Slot|SlotWidth=0.80mm|SlotLength=1.80mm|Layer=MultiLayer|Shape=Oval|Rotation=90|Plated=False|
+|RECORD=Track|X1=-2.40mm|Y1=-1.40mm|X2=2.40mm|Y2=-1.40mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=2.40mm|Y1=-1.40mm|X2=2.40mm|Y2=1.40mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=2.40mm|Y1=1.40mm|X2=-2.40mm|Y2=1.40mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=-2.40mm|Y1=1.40mm|X2=-2.40mm|Y2=-1.40mm|Layer=TopOverlay|Width=0.12mm|

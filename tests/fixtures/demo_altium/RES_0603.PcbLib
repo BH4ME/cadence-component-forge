@@ -1,0 +1,8 @@
+|RECORD=Component|Name=RES_0603|Description=Demo 0603 resistor footprint|
+|RECORD=Pad|Designator=1|X=-0.8mm|Y=0mm|XSize=0.9mm|YSize=0.95mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Pad|Designator=2|X=0.8mm|Y=0mm|XSize=0.9mm|YSize=0.95mm|Layer=TopLayer|Shape=RoundedRectangle|Rotation=0|
+|RECORD=Track|X1=-1.6mm|Y1=-0.7mm|X2=1.6mm|Y2=-0.7mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=1.6mm|Y1=-0.7mm|X2=1.6mm|Y2=0.7mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=1.6mm|Y1=0.7mm|X2=-1.6mm|Y2=0.7mm|Layer=TopOverlay|Width=0.12mm|
+|RECORD=Track|X1=-1.6mm|Y1=0.7mm|X2=-1.6mm|Y2=-0.7mm|Layer=TopOverlay|Width=0.12mm|
+

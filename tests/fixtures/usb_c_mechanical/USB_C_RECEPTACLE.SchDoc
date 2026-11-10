@@ -1,0 +1,9 @@
+|RECORD=Component|DesignItemID=J_USB_C_MECH|Designator=J?|Footprint=USB_C_MECH|Comment=USB-C mechanical pad smoke|Description=USB-C receptacle with shield tabs and NPTH locating holes|
+|RECORD=Pin|PinNumber=A1|PinName=GND|PinType=Passive|Part=A|Orientation=0|
+|RECORD=Pin|PinNumber=A4|PinName=VBUS|PinType=Power|Part=A|Orientation=0|
+|RECORD=Pin|PinNumber=A5|PinName=CC1|PinType=Passive|Part=A|Orientation=0|
+|RECORD=Pin|PinNumber=A6|PinName=D+|PinType=Bidirectional|Part=A|Orientation=0|
+|RECORD=Pin|PinNumber=A7|PinName=D-|PinType=Bidirectional|Part=A|Orientation=0|
+|RECORD=Pin|PinNumber=B5|PinName=CC2|PinType=Passive|Part=A|Orientation=180|
+|RECORD=Pin|PinNumber=B6|PinName=D+|PinType=Bidirectional|Part=A|Orientation=180|
+|RECORD=Pin|PinNumber=B7|PinName=D-|PinType=Bidirectional|Part=A|Orientation=180|

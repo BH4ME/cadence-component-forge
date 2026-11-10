@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "id": "cadence_0603",
+      "match_regex": "^(c|r|l|f)?0603.*$",
+      "model": "0603.step",
+      "source": "cadence_standard_library"
+    },
+    {
+      "id": "cadence_0805",
+      "match_regex": "^(c|r|l|f)?0805.*$",
+      "model": "0805.step",
+      "source": "cadence_standard_library"
+    }
+  ]
+}

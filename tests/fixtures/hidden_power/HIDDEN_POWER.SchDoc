@@ -1,0 +1,6 @@
+|RECORD=Component|DesignItemID=U_HIDDEN_PWR|Designator=U?|Footprint=SOT_23_5|Comment=Hidden power demo|Description=Five-pin symbol with hidden global power pins|
+|RECORD=Pin|PinNumber=1|PinName=IN+|PinType=Input|Orientation=0|
+|RECORD=Pin|PinNumber=2|PinName=IN-|PinType=Input|Orientation=0|
+|RECORD=Pin|PinNumber=3|PinName=OUT|PinType=Output|Orientation=180|
+|RECORD=Pin|PinNumber=4|PinName=VCC|PinType=Power|Orientation=90|Hidden=True|
+|RECORD=Pin|PinNumber=5|PinName=GND|PinType=Power|Orientation=270|PinVisible=False|
