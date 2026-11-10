@@ -54,6 +54,10 @@ flowchart LR
 
 ## 安装
 
+### 下载 Windows 安装包
+
+稳定源码和 Windows 安装包统一放在 [GitHub Releases](https://github.com/BH4ME/cadence-component-forge/releases)。安装包不包含 Cadence，本机仍需安装 Capture/Allegro；生产在线更新只有在配置正式 HTTPS 清单和公钥后才会启用。
+
 ### Windows 安装包
 
 发布包包含自带的 Python 运行时，用户不需要另装 Python、Node.js 或 Codex。运行 `JLC2Cadence-<version>-Setup.exe`，选择已安装的 Cadence 根目录和元件库目录，然后重新启动 Capture。
