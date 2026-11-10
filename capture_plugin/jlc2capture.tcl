@@ -186,11 +186,15 @@ proc ::JLC2Capture::configure {} {
 
 proc ::JLC2Capture::enabled {args} { return 1 }
 
+# Capture menu Update actions require the literal true/false result; their
+# handler is distinct from RegisterAction's numeric shouldProcess predicate.
+proc ::JLC2Capture::menuEnabled {args} { return true }
+
 proc ::JLC2Capture::register {} {
     variable registered
     if {$registered || ![llength [info commands RegisterAction]]} { return }
     RegisterAction JLC2CaptureSearch ::JLC2Capture::enabled "" ::JLC2Capture::openBrowser ""
-    RegisterAction JLC2CaptureUpdate ::JLC2Capture::enabled "" ::JLC2Capture::enabled ""
+    RegisterAction JLC2CaptureUpdate ::JLC2Capture::enabled "" ::JLC2Capture::menuEnabled ""
     RegisterAction JLC2CaptureExtensionUpdate ::JLC2Capture::enabled "" ::JLC2CaptureUpdates::show ""
     InsertXMLMenu [list [list JLC2Capture] "0" Help [list popup "JLC/LCSC" "0" "" "" "" ""] ""]
     InsertXMLMenu [list [list JLC2Capture Search] "" "" [list action "Search Components..." "0" JLC2CaptureSearch JLC2CaptureUpdate "" "" "" "JLC/LCSC"] ""]

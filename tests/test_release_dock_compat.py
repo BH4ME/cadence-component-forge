@@ -10,6 +10,35 @@ ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "capture_plugin/jlc2capture.tcl"
 
 
+class CaptureMenuCompatibilityTests(unittest.TestCase):
+    def test_search_and_update_menus_return_capture_update_boolean(self):
+        tcl = tkinter.Tcl()
+        tcl.eval(
+            "set ::actions {}; set ::menus {}; "
+            "proc RegisterAction {name predicate shortcut handler context} {"
+            "dict set ::actions $name [list $predicate $handler]}; "
+            "proc InsertXMLMenu {definition} {lappend ::menus $definition}; "
+            "proc RefreshMenu {} {}"
+        )
+        tcl.call("source", str(PLUGIN))
+        menu_items = []
+        for definition in tcl.getvar("::menus"):
+            item = definition[3]
+            if item[0] == "action":
+                menu_items.append(item)
+        self.assertEqual({item[1] for item in menu_items},
+                         {"Search Components...", "Check for Updates..."})
+        for item in menu_items:
+            with self.subTest(menu=item[1]):
+                predicate, handler = tcl.call("dict", "get", tcl.getvar("::actions"), item[4])
+                self.assertTrue(tcl.getboolean(tcl.call(predicate)))
+                # Capture's menu Update handler uses the literal true/false
+                # result, unlike RegisterAction's numeric shouldProcess gate.
+                # This follows Cadence's GUI TCL samples 16 and 17.
+                self.assertEqual(tcl.call(handler), "true")
+                self.assertEqual(tcl.call(handler, "menu-context"), "true")
+
+
 class ReleaseDockCompatibilityTests(unittest.TestCase):
     """Capability emulation, not a claim of native Capture 17.2 validation."""
 

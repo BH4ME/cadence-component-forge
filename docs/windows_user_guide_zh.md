@@ -78,6 +78,22 @@ PCB 封装几何应在 Allegro 中打开 `.dra` 编辑，再重新生成 `.psm`�
 STEP 预览只对原始文件进行三角网格显示和必要的单位/坐标转换，原始 STEP 保持不变。
 预览失败或模型超过显示大小限制，不代表已经下载的 STEP 文件不存在。
 
+## JLC/LCSC 菜单中的两项都变灰
+
+0.47.0 的菜单启用回调错误地返回了数字 `1`。Capture 的菜单 Update 回调要求
+返回 `true` 或 `false`，因此“Search Components...”和“Check for Updates...”会一起禁用。
+修复版源码已将菜单 Update 回调与动作处理的前置判断分开。
+
+已经打开的 Capture 会继续使用旧回调。更新插件源码后，保存工作并重启 Capture 即可加载修复。
+也可以在当前会话选择 **View → Command Window**，输入下面一行并按 Enter：
+
+```tcl
+proc ::JLC2Capture::enabled {args} { return true }; RefreshMenu
+```
+
+这条临时修复只更新菜单回调，不修改工程或元件库；使用旧安装包时下次启动仍需重新执行。
+菜单恢复后选择 **JLC/LCSC → Search Components...** 打开搜索面板。
+
 ## 在线升级
 
 Capture 中打开 `JLC/LCSC → Check for Updates...`，或点击内嵌页面的更新按钮。
