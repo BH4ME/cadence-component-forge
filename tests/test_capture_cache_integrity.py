@@ -113,7 +113,9 @@ class CaptureCacheIntegrityTests(unittest.TestCase):
         self.assertEqual(external.read_bytes(), b"unrelated external bytes")
         self.assertNotIn(str(external), rebuilt["published_files"])
 
-    def test_source_exact_preview_restores_original_pin_coordinate_after_xml_edit(self):
+    # This regression checks cache recovery, not Windows GDI font measurement.
+    @patch("jlc2cadence.generators.capture._capture_text_metrics", return_value=(8, 10, 20))
+    def test_source_exact_preview_restores_original_pin_coordinate_after_xml_edit(self, _metrics):
         def source_library(_part):
             raw = resistor_data()
             # The catalog parser fixture omits pin-label font sizes. Supply
