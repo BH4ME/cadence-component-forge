@@ -1,0 +1,61 @@
+{
+  "version": "0.49.0",
+  "tested_on_local_date": "2026-11-12",
+  "scope": "Offline parse and validation of original cached CAD from the historical 478-leaf-category selection. No new CAD downloads and no native Allegro process in this sweep.",
+  "selected_categories": 478,
+  "unique_parts": 478,
+  "original_cached_cad_examined": 392,
+  "source_parse_and_validation_passed": 292,
+  "source_parse_rejected": 100,
+  "no_cached_source_not_retested": 86,
+  "all_examined_input_bytes_unchanged": true,
+  "extractor_sha256": "92d551c6e664e403a1de161f890d7bdca6da5c415b720f09d1e489e1b1b6eb82",
+  "stage_difference_explanation": "Eight items pass source parsing but failed historical target preparation. Repeating full 2D preparation rejected all eight again, so parser-only success must not be counted as successful conversion.",
+  "stage_difference_retests": [
+    {
+      "part_id": "C16684",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C3791",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C9363",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C8953",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C435422",
+      "prepare_ok": false,
+      "error_code": "operation_failed"
+    },
+    {
+      "part_id": "C92655",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C110291",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    },
+    {
+      "part_id": "C52878",
+      "prepare_ok": false,
+      "error_code": "unsupported_geometry"
+    }
+  ],
+  "limitations": [
+    "This is not 478 end-to-end native retests.",
+    "The 86 uncached records were not re-fetched or re-tested.",
+    "Parser validation alone does not prove native target compatibility."
+  ]
+}

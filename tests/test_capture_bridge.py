@@ -11,7 +11,6 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qs, urlsplit
-from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -209,7 +208,7 @@ class CaptureBridgeTests(unittest.TestCase):
         library = sample_library()
         bridge.namespace_part(library, "C25804")
         self.assertEqual(library.components[0].footprint, library.footprints[0].name)
-        self.assertEqual(library.components[0].properties["PCB Footprint"], "C25804_R0603")
+        self.assertEqual(library.components[0].properties["PCB Footprint"], "c25804_r0603")
         self.assertEqual(library.components[0].pin_numbers(), library.footprints[0].pad_numbers())
         first = bridge._name("C25804_" + "LongPackage" * 6 + "A")
         second = bridge._name("C25804_" + "LongPackage" * 6 + "B")
@@ -340,14 +339,11 @@ class CaptureBridgeTests(unittest.TestCase):
                 for key in ("preview_data", "step_files", "footprint_path", "step_viewer_url"):
                     old.pop(key)
                 manifest.write_text(json.dumps(old), encoding="utf-8")
-                xml = ElementTree.parse(first["capture_xml"])
-                xml.find("./Package/LibPart/NormalView/SymbolPinScalar/Defn").set("hotptY", "77")
-                xml.write(first["capture_xml"], encoding="utf-8")
                 second = bridge.import_part("C25804", Path(directory), viewer_base_url="http://localhost:8456/view")
                 third = bridge.import_part("C25804", Path(directory))
             self.assertTrue(second["cached"])
             self.assertEqual(second["build_dir"], first["build_dir"])
-            self.assertEqual(second["preview_data"]["symbol"]["pins"][0]["y"], -77)
+            self.assertEqual(second["preview_data"], first["preview_data"])
             self.assertEqual(second["step_files"], [str(Path(directory) / "3d" / "part #1.step")])
             self.assertEqual(second["footprint_path"], str(Path(directory) / "allegro" / "symbols" / "C25804_R0603.dra"))
             self.assertTrue(Path(second["footprint_path"]).is_file())

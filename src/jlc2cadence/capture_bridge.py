@@ -25,14 +25,14 @@ from xml.etree import ElementTree
 from . import __version__
 from .native_geometry_errors import source_native_geometry_error
 from .extractors.easyeda_3d import EasyEDA3DFetchReport, fetch_easyeda_3d_models, write_easyeda_3d_fetch_report
-from .generators.allegro_skill import source_refdes_report, write_allegro_outputs
+from .generators.allegro_skill import _padstack_name, source_refdes_report, write_allegro_outputs
 from .generators.capture import write_capture_outputs
 from .generators.model3d import write_model_map
 from .ir.geometry import cadence_safe_name
 from .ir.normalize import attach_models
 from .ir.schema import LibraryIR
 from .reports.svg_preview import write_svg_previews
-from .step_preview import is_current_step_glb
+from .step_preview import cached_step_preview_error, is_current_step_glb
 from .validators.cadence_runner import (
     CadenceTools, compile_existing_package_symbols, run_step_mapping, run_symbol_build_plan,
 )
@@ -74,6 +74,108 @@ def _catalog(root: Path, timeout: float):
     from .extractors.easyeda_catalog import EasyEDACatalog
 
     return EasyEDACatalog(cache_dir=root / "cache" / "catalog", timeout=timeout)
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _owned_asset_path(value: str | Path, root: Path, parents: tuple[Path, ...]) -> Path:
+    path = Path(value).resolve()
+    if not path.is_relative_to(root) or path.parent not in parents:
+        raise ValueError("Cache asset is outside its managed directory")
+    return path
+
+
+def _known_cache_assets(root: Path, build: Path, *, published: bool) -> set[Path]:
+    """Discover only generated assets in this build, without trusting JSON paths."""
+    paths = {build / "capture" / "library.olb.xml", build / "reports" / "library.ir.json"}
+    for relative, suffixes in (("3d", {".step", ".stp"}),
+                               ("allegro/symbols", {".dra", ".psm"}),
+                               ("allegro/padstacks", {".pad"})):
+        directory = build / relative
+        for path in directory.glob("*"):
+            if path.suffix.lower() in suffixes:
+                paths.add(path)
+                if published:
+                    paths.add(root / relative / path.name)
+    # Check every resolved path before any content is read or copied, including
+    # junctions/symlinks in otherwise familiar build directory names.
+    return {_owned_asset_path(path, root, (path.parent,)) for path in paths}
+
+
+def _cache_asset_paths(result: dict[str, Any], root: Path, build: Path) -> set[Path]:
+    fixed = {"library_root": root, "build_dir": build,
+             "capture_xml": build / "capture" / "library.olb.xml",
+             "olb_path": build / "capture" / "library.olb",
+             "source_provenance": build / "reports" / "source_provenance.json"}
+    for key, expected in fixed.items():
+        if Path(result[key]).resolve() != expected:
+            raise ValueError(f"Cache identity mismatch: {key}")
+    paths = _known_cache_assets(root, build, published=not result["prepared_only"])
+    published_parents = (root / "3d", root / "allegro" / "symbols", root / "allegro" / "padstacks")
+    for value in result["published_files"]:
+        path = _owned_asset_path(value, root, published_parents)
+        if path not in paths:
+            raise ValueError("Published cache asset has no generated source")
+    for value in result.get("step_files", []):
+        if _owned_asset_path(value, root, (root / "3d", build / "3d")) not in paths:
+            raise ValueError("STEP cache asset has no generated source")
+    if result.get("footprint_path"):
+        _owned_asset_path(result["footprint_path"], root, (root / "allegro" / "symbols", build / "allegro" / "symbols"))
+    for value in result.get("previews", {}).values():
+        _owned_asset_path(value, root, (build / "reports",))
+    return paths
+
+
+def _load_asset_cache(
+    manifest: Path, root: Path, build: Path, part_id: str, target_root: str, *, prepared: bool,
+) -> tuple[dict[str, Any] | None, list[str]]:
+    if not manifest.is_file():
+        return None, []
+    proofs: dict[str, str] = {}
+    paths = _known_cache_assets(root, build, published=not prepared)
+    try:
+        result = json.loads(manifest.read_text(encoding="utf-8"))
+        if (result["part_id"] != part_id or result["version"] != __version__
+                or result["build_revision"] != BRIDGE_BUILD_REVISION
+                or result["cadence_target"] != target_root or result["prepared_only"] is not prepared
+                or not isinstance(result["published_files"], list)
+                or not isinstance(result["warnings"], list)):
+            raise ValueError("Cache identity mismatch")
+        paths = _cache_asset_paths(result, root, build)
+        candidate = result["generated_file_sha256"]
+        if not isinstance(candidate, dict) or set(candidate) != {str(path) for path in paths}:
+            raise ValueError("Cache integrity proofs are missing or incomplete")
+        if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value) for value in candidate.values()):
+            raise ValueError("Cache integrity proof is invalid")
+        proofs = candidate
+        if any(not path.is_file() or not path.stat().st_size or _file_sha256(path) != proofs[str(path)] for path in paths):
+            raise ValueError("Generated assets have changed or are missing")
+        return result, []
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        pass
+    # A manually edited managed file is valuable user data. Preserve its exact
+    # bytes before rebuilding; if preservation fails, fail without overwriting.
+    backups = []
+    for path in sorted(paths):
+        if path.is_file():
+            digest = _file_sha256(path)
+            if proofs.get(str(path)) == digest:
+                continue
+            backup = root / ".modified_assets" / build.name / path.relative_to(root) / f"{digest}.bak"
+            if not backup.resolve().is_relative_to(root / ".modified_assets"):
+                raise ValueError("Modified asset backup directory is outside the library")
+            _publish_file(path, backup)
+            backups.append(str(backup))
+    warning = "缓存索引或生成文件校验失败，已从原始数据重新生成。"
+    if backups:
+        warning += f" 原有文件已备份至 {root / '.modified_assets' / build.name}。"
+    return None, [warning]
 
 
 def search_parts(
@@ -123,13 +225,17 @@ def namespace_part(library: LibraryIR, part_id: str) -> None:
     def prefixed(value: str) -> str:
         return _name(value if value.upper().startswith(part_id + "_") else f"{part_id}_{value}")
 
-    names = {footprint.name: prefixed(footprint.name) for footprint in library.footprints}
+    # Allegro writes package-symbol basenames in lowercase; its native symbol
+    # placement API is case-sensitive even on Windows.
+    names = {footprint.name: prefixed(footprint.name).lower() for footprint in library.footprints}
     for footprint in library.footprints:
         footprint.properties["Source_Footprint_Name"] = footprint.name
         footprint.name = names[footprint.name]
         for pad in footprint.pads:
-            if pad.padstack:
-                pad.padstack = prefixed(pad.padstack)
+            # Native PAD files contain build-specific metadata. Sharing a name
+            # across parts would overwrite another part's verified file even
+            # when the original pad geometry is identical.
+            pad.padstack = prefixed(pad.padstack or _padstack_name(pad))
     for component in library.components:
         component.properties["Source_Symbol_Name"] = component.name
         component.name = prefixed(component.name)
@@ -440,6 +546,9 @@ def _viewer_json(request: Request, timeout: float) -> dict[str, Any]:
 
 def _generate_local_step_preview(step: Path, root: Path) -> None:
     # Isolate OCCT crashes and bound preview work independently from native imports.
+    cached_error = cached_step_preview_error(step, root, MAX_PREVIEW_GLB_BYTES)
+    if cached_error:
+        raise ValueError(cached_error)
     executable = sys.executable
     # A pythonw parent has ``sys.stdout is None`` and cannot return the preview
     # JSON through a captured pipe.  Use its paired console interpreter for this
@@ -609,21 +718,15 @@ def import_part(
         reports.mkdir(exist_ok=True)
         manifest_path = build / "capture_browser.json"
         preview_manifest = build / "preview_browser.json"
+        cache_warnings = []
         if prepare_only and preview_manifest.is_file():
-            try:
-                existing = json.loads(preview_manifest.read_text(encoding="utf-8"))
-                required = [Path(existing["capture_xml"]), reports / "library.ir.json"]
-                required.extend(Path(item) for item in existing.get("step_files", []))
+            existing, recovery_warnings = _load_asset_cache(
+                preview_manifest, root, build, part_id, target_root, prepared=True,
+            )
+            cache_warnings.extend(recovery_warnings)
+            if existing:
                 fresh = defer_step or existing.get("step_status") == "available" or time.time() - preview_manifest.stat().st_mtime < 300
-                identity_matches = (existing.get("part_id") == part_id and existing.get("version") == __version__
-                                    and existing.get("build_revision") == BRIDGE_BUILD_REVISION
-                                    and existing.get("cadence_target") == target_root)
-                step_hashes = {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
-                               for path in map(Path, existing.get("step_files", []))}
-                step_matches = existing.get("preview_step_sha256", {}) == step_hashes
-                if (identity_matches and existing.get("ok") and existing.get("prepared_only") and fresh
-                        and step_matches and existing.get("preview_data")
-                        and all(path.is_file() and path.stat().st_size for path in required)):
+                if existing.get("ok") and fresh:
                     existing["cached"] = True
                     # Revalidate external files and current viewer settings; an
                     # embedded mesh from a previous response is not proof that
@@ -631,27 +734,26 @@ def import_part(
                     _enrich_asset_previews(existing, root, build, viewer_base_url, load_3d=not defer_step)
                     existing["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
                     return existing
-            except (OSError, ValueError, TypeError, KeyError, AttributeError):
-                pass
         # Preview requests use ``--prepare-only`` but may target a component that
         # was already fully imported.  Reuse the content-addressed manifest in
         # that case; rebuilding the same symbol/footprint on every row click was
         # the main source of the multi-second Capture delay.
         if manifest_path.exists():
-            existing = json.loads(manifest_path.read_text(encoding="utf-8"))
-            required = [Path(item) for item in existing.get("published_files", [])]
-            if (existing.get("ok") and existing.get("asset_status", "complete") == "complete"
-                    and existing.get("step_status") == "available" and required
-                    and Path(existing["capture_xml"]).is_file() and Path(existing["capture_xml"]).stat().st_size
-                    and (reports / "library.ir.json").is_file() and (reports / "library.ir.json").stat().st_size
-                    and all(item.is_file() and item.stat().st_size for item in required)):
+            existing, recovery_warnings = _load_asset_cache(
+                manifest_path, root, build, part_id, target_root, prepared=False,
+            )
+            cache_warnings.extend(recovery_warnings)
+            if (existing and existing.get("ok") and existing.get("asset_status") == "complete"
+                    and existing.get("step_status") == "available" and existing["published_files"]):
                 existing["cached"] = True
+                existing["warnings"] = list(dict.fromkeys([*existing["warnings"], *cache_warnings]))
                 _enrich_asset_previews(existing, root, build, viewer_base_url)
+                existing["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
                 return existing
 
         warnings = [str(item) for item in validation.warnings if "has no padstack name" not in str(item)
                     and "has no linked 3D model" not in str(item)]
-        warnings = list(dict.fromkeys([*library.warnings, *warnings]))
+        warnings = list(dict.fromkeys([*library.warnings, *warnings, *cache_warnings]))
         model_started = time.perf_counter()
         if defer_step:
             models = EasyEDA3DFetchReport(output_dir=str(build / "3d"), formats=["step"])
@@ -724,8 +826,9 @@ def import_part(
         }
         if prepare_only:
             _enrich_asset_previews(result, root, build, viewer_base_url, load_3d=not defer_step)
-            result["preview_step_sha256"] = {path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+            result["preview_step_sha256"] = {path: _file_sha256(Path(path))
                                              for path in result.get("step_files", [])}
+            result["generated_file_sha256"] = {str(path): _file_sha256(path) for path in _cache_asset_paths(result, root, build)}
             result["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
             write_response(preview_manifest, result)
             return result
@@ -791,10 +894,11 @@ def import_part(
             "allegro_status": result["allegro_status"], "step_mapping_status": result["step_mapping_status"],
             "native_build_results": str(build / "allegro" / "symbols" / "create_symbols.results.json"),
             "native_environment_warnings": environment_warnings,
-            "published_file_sha256": {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in published},
+            "published_file_sha256": {path: _file_sha256(Path(path)) for path in published},
         })
         write_response(provenance, provenance_data)
         _enrich_asset_previews(result, root, build, viewer_base_url)
+        result["generated_file_sha256"] = {str(path): _file_sha256(path) for path in _cache_asset_paths(result, root, build)}
         write_allegro_paths(root)
         result["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
         write_response(manifest_path, result)

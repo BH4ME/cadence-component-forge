@@ -13,9 +13,14 @@ import struct
 import sys
 import tempfile
 import threading
+from importlib.metadata import PackageNotFoundError, version as distribution_version
+
+from . import __version__
 
 
 DEFAULT_MAX_BYTES = 6 * 1024 * 1024
+# Bump when tessellation settings or the GLB conversion algorithm change.
+PREVIEW_RENDERER_REVISION = 1
 _OCP_LOCK = threading.Lock()
 # Windows can reject two simultaneous replacements of the same destination
 # even when each caller has its own temporary file.  Keep the expensive STEP
@@ -43,6 +48,68 @@ def _sha256(path: Path) -> str:
 
 def _inside(path: Path, root: Path) -> bool:
     return path.is_relative_to(root)
+
+
+def _preview_limit_key(source_sha256: str, max_bytes: int) -> dict:
+    renderer_version = "unavailable"
+    for package in ("cadquery-ocp-novtk", "cadquery-ocp"):
+        try:
+            renderer_version = f"{package}=={distribution_version(package)}"
+            break
+        except PackageNotFoundError:
+            pass
+    return {"source_step_sha256": source_sha256, "max_bytes": max_bytes,
+            "converter_version": __version__, "renderer": "occt-stepcaf-gltf",
+            "renderer_revision": PREVIEW_RENDERER_REVISION, "renderer_version": renderer_version}
+
+
+def _has_preview_limit_result(step: Path, root: Path, key: dict) -> bool:
+    status = step.with_name(f".{step.name}.preview-status.json").resolve()
+    try:
+        if not _inside(status, root) or not status.is_file() or status.stat().st_size > 4096:
+            return False
+        value = json.loads(status.read_text(encoding="utf-8"))
+        return value == {"format": 1, "error_code": "step_preview_too_large", "key": key}
+    except (OSError, ValueError, TypeError):
+        return False
+
+
+def _preview_limit_message(max_bytes: int) -> str:
+    return f"The original STEP preview exceeds the {max_bytes}-byte limit."
+
+
+def cached_step_preview_error(step: Path, root: Path, max_bytes: int = DEFAULT_MAX_BYTES) -> str | None:
+    """Return only a confirmed size-limit result for this source and renderer."""
+    try:
+        if type(max_bytes) is not int or max_bytes <= 0:
+            return None
+        root, step = Path(root).resolve(strict=True), Path(step).resolve(strict=True)
+        if not _inside(step, root) or step.suffix.lower() not in {".step", ".stp"}:
+            return None
+        if _has_preview_limit_result(step, root, _preview_limit_key(_sha256(step), max_bytes)):
+            return _preview_limit_message(max_bytes)
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def _remember_preview_limit(step: Path, root: Path, key: dict) -> None:
+    status = step.with_name(f".{step.name}.preview-status.json")
+    if not _inside(status.resolve(), root):
+        raise ValueError("Preview status is outside the library root")
+    descriptor, name = tempfile.mkstemp(prefix=".step-preview-status-", suffix=".tmp", dir=step.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump({"format": 1, "error_code": "step_preview_too_large", "key": key}, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        with _PUBLISH_LOCK:
+            if not _inside(status.resolve(), root):
+                raise ValueError("Preview status moved outside the library root")
+            os.replace(temporary, status)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _export_step_glb(step: Path, output: Path) -> None:
@@ -174,8 +241,12 @@ def generate_step_glb(step: Path, root: Path, max_bytes: int = DEFAULT_MAX_BYTES
     if not _inside(output.resolve(), root):
         raise _error("The GLB preview destination is outside the selected library root.",
                      "step_preview_outside_root")
+    confirmed_too_large = False
     try:
         source_sha256 = _sha256(candidate)
+        limit_key = _preview_limit_key(source_sha256, max_bytes)
+        if _has_preview_limit_result(candidate, root, limit_key):
+            raise _error(_preview_limit_message(max_bytes), "step_preview_too_large")
         with tempfile.TemporaryDirectory(prefix=".step-preview-", dir=candidate.parent) as temporary:
             scratch = Path(temporary)
             snapshot = scratch / "source.step"
@@ -193,12 +264,12 @@ def generate_step_glb(step: Path, root: Path, max_bytes: int = DEFAULT_MAX_BYTES
                 raise _error("The STEP exporter did not create a GLB.",
                              "step_preview_export_failed")
             if temporary_glb.stat().st_size > max_bytes:
-                raise _error(f"The original STEP preview exceeds the {max_bytes}-byte limit.",
-                             "step_preview_too_large")
+                confirmed_too_large = True
+                raise _error(_preview_limit_message(max_bytes), "step_preview_too_large")
             converted = _orient_glb(temporary_glb.read_bytes(), source_sha256)
             if len(converted) > max_bytes:
-                raise _error(f"The original STEP preview exceeds the {max_bytes}-byte limit.",
-                             "step_preview_too_large")
+                confirmed_too_large = True
+                raise _error(_preview_limit_message(max_bytes), "step_preview_too_large")
             with temporary_glb.open("wb") as stream:
                 stream.write(converted)
                 stream.flush()
@@ -212,6 +283,14 @@ def generate_step_glb(step: Path, root: Path, max_bytes: int = DEFAULT_MAX_BYTES
             with _PUBLISH_LOCK:
                 os.replace(temporary_glb, output)
     except StepPreviewError:
+        if confirmed_too_large:
+            # Persist only a measured size result for unchanged source bytes.
+            # Network, dependency, meshing and other transient failures retry.
+            try:
+                if _sha256(candidate) == source_sha256:
+                    _remember_preview_limit(candidate, root, limit_key)
+            except (OSError, ValueError):
+                pass  # Cache-write failure must not hide the original error.
         raise
     except Exception as exc:
         raise _error(f"Local STEP preview failed: {exc}", "step_preview_failed") from exc

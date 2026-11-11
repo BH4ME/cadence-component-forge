@@ -968,23 +968,87 @@ proc ::JLC2Capture::importPart {place} {
     set placeRequested $place
     set operationPart $selected
     set operationRoot [file normalize $libraryRoot]
-    set key [list $operationRoot $operationPart]
-    set cached [cachedImport $key]
-    if {$cached ne "" && [get $cached step_status] eq "available"} {
-        if {[catch {finishImport $cached} message]} { showError $message }
-        return
-    }
+    # The backend verifies current source and generated asset hashes. An
+    # in-memory UI response is not evidence that disk files are unchanged.
     set status "\u6b63\u5728\u5bfc\u5165 $selected ..."
     start import [list --part $selected]
 }
 
+proc ::JLC2Capture::nativeFileFingerprint {path} {
+    if {![llength [info commands zlib]]} { error "Capture runtime lacks zlib CRC32 for native library integrity checks" }
+    if {![file isfile $path] || [file size $path] == 0} { error "Native library input is missing or empty: $path" }
+    set stream [open $path rb]
+    set crc 0
+    set size 0
+    set failed [catch {
+        while {![eof $stream]} {
+            set block [read $stream 65536]
+            incr size [string length $block]
+            set crc [zlib crc32 $block $crc]
+        }
+    } message options]
+    close $stream
+    if {$failed} { return -options $options $message }
+    return [list $size [format %08x $crc]]
+}
+
+proc ::JLC2Capture::verifiedOlb {base xmlFingerprint} {
+    set metadata "$base.integrity"
+    if {![file isfile $metadata]} { return "" }
+    set stream [open $metadata r]
+    set failed [catch {set proof [read $stream 8192]} message options]
+    close $stream
+    if {$failed} { return -options $options $message }
+    # This is data, never a script. A corrupted sidecar cannot direct reads
+    # outside this generated Capture directory or at unrelated libraries.
+    if {[dict get $proof format] != 1 || [dict get $proof xml] ne $xmlFingerprint} { return "" }
+    set name [dict get $proof file]
+    set stem [file rootname [file tail $base]]
+    if {$name ne [file tail $name] || [file pathtype $name] ne "relative"
+        || ($name ne [file tail $base] &&
+            ([string first "$stem.verified." $name] != 0 || [file extension $name] ne ".olb"))} { return "" }
+    set candidate [file join [file dirname $base] $name]
+    if {[nativeFileFingerprint $candidate] ne [dict get $proof olb]} { return "" }
+    return $candidate
+}
+
+proc ::JLC2Capture::saveOlbProof {base olb xmlFingerprint} {
+    set proof [dict create format 1 file [file tail $olb] xml $xmlFingerprint olb [nativeFileFingerprint $olb]]
+    set metadata "$base.integrity"
+    set temporary "$metadata.[pid].[clock clicks].tmp"
+    set stream [open $temporary {WRONLY CREAT EXCL}]
+    set failed [catch {puts -nonewline $stream $proof; flush $stream} message options]
+    close $stream
+    if {$failed} {
+        file delete $temporary
+        return -options $options $message
+    }
+    if {[catch {file rename -force $temporary $metadata} message options]} {
+        file delete $temporary
+        return -options $options $message
+    }
+}
+
 proc ::JLC2Capture::buildOlb {data} {
-    set olb [get $data olb_path]
-    if {$olb eq ""} { error "Backend response is missing olb_path" }
-    if {[file exists $olb] && [file size $olb] > 0} { return $olb }
+    set base [get $data olb_path]
+    if {$base eq ""} { error "Backend response is missing olb_path" }
+    set base [file normalize $base]
     set xml [get $data capture_xml]
     if {$xml eq "" || ![file exists $xml]} { error "Capture XML is missing: $xml" }
+    set xmlFingerprint [nativeFileFingerprint $xml]
+    if {![catch {verifiedOlb $base $xmlFingerprint} verified] && $verified ne ""} { return $verified }
     if {![llength [info commands XMATIC_XML2OLB]]} { error "XMATIC_XML2OLB is unavailable in this interpreter" }
+    set olb $base
+    if {[file exists $olb]} {
+        # Capture can retain a library in memory. Preserve every existing OLB
+        # byte-for-byte, and compile repairs to a new path for PlaceNew.
+        set suffix [clock clicks]
+        set olb "[file rootname $base].verified.[lindex $xmlFingerprint 1].$suffix.olb"
+        while {[file exists $olb]} {
+            incr suffix
+            set olb "[file rootname $base].verified.[lindex $xmlFingerprint 1].$suffix.olb"
+        }
+    }
     set logPath [file rootname $olb].import.log
     set tclPath [file rootname $olb].import.tcl
     set result [catch {XMATIC_XML2OLB $xml $olb false $logPath $tclPath true} message]
@@ -993,6 +1057,8 @@ proc ::JLC2Capture::buildOlb {data} {
     if {$result || ![file exists $olb] || [file size $olb] == 0} {
         error "Capture library import failed: $message\n$logPath"
     }
+    if {[nativeFileFingerprint $xml] ne $xmlFingerprint} { error "Capture XML changed during native conversion; retry the import" }
+    saveOlbProof $base $olb $xmlFingerprint
     return $olb
 }
 
@@ -1016,6 +1082,7 @@ proc ::JLC2Capture::finishImport {data} {
     if {![sourceExactResult $data]} { error "Import response conversion_policy must be source_exact; import this part again with the current converter" }
     validatePublishedAssets $data
     set olb [buildOlb $data]
+    dict set data olb_path $olb
     registerFootprintPath $responseRoot [get $data footprint_name]
     set symbol [get $data symbol_name]
     if {$symbol eq ""} { error "Backend response is missing symbol_name" }

@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`v0.48`
+`v0.49`
 
 ## Rules
 
@@ -14,6 +14,7 @@
 
 | Version | Date | Reason |
 |---|---|---|
+| `v0.49` | 2026-11-12 | Verify native PCB placement/save/reopen with explicit product selection; align PSM naming, isolate generated PAD names by part, and recover corrupt asset/OLB caches without discarding edited files. See docs/releases/v0.49.0.md. |
 | `v0.48` | 2026-11-11 | Separate original 2D preview from on-demand STEP loading, cache prepared previews, recover local 3D rendering when viewer is unavailable, and register Capture/Allegro library paths. Include the Capture menu fix in rebuilt Windows installers. Validation details: docs/releases/v0.48.0.md. |
 | `v0.47` | 2026-11-10 | Windows candidate r7 rebuilt after fixing concurrent STEP preview publication on Windows; signed update, installer lifecycle, Capture/Allegro evidence and performance acceptance were renewed. Production feed and Cadence 17.2 native host remain external prerequisites. |
 | `v0.46` | 2026-11-09 | Completed the 478-leaf electronic category matrix with resumable isolated native preparation and truthful source/conversion failure records; the generated ledger and Chinese report preserve the verification limits. |

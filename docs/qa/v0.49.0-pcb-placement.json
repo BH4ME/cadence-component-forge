@@ -1,0 +1,204 @@
+{
+  "version": "0.49.0",
+  "native_product": "OrCAD PCB Designer Professional 17.4 S039",
+  "product_argument": "OrCAD_PCB_Designer",
+  "total_runs": 10,
+  "passed_runs": 8,
+  "failed_runs": 2,
+  "functional_representatives": {
+    "C11255": 2,
+    "C2316": 3,
+    "C9160": 42,
+    "C581080": 44
+  },
+  "all_representatives_have_complete_successful_runs": true,
+  "stability_status": "unresolved_native_intermittent_failure",
+  "limitations": [
+    "The initial final-library FPC placement returned nil and native exit 0xC0000005.",
+    "An uppercase C11255 run placed/saved successfully, but process exit timed out after 90 seconds; it remains a failed run.",
+    "A second forced-uppercase run passed all phases; filename case is not an established failure cause.",
+    "No source changes were made between failed and successful repeats. Failures are not suppressed by retries.",
+    "Pin centers, numbers, padstack names, and STEP metadata were compared. This is not full 3D fit or DRC design qualification.",
+    "Only this 17.4 installation was tested; 17.2 is not installed."
+  ],
+  "runs": [
+    {
+      "case": "C11255",
+      "ok": true,
+      "requested_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
+      "native_footprint": "c11255_res_th_bd3_0_l9_49041e03",
+      "comparison": {
+        "pin_count": 2,
+        "max_pin_center_error_mm": 0.0,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "C2316",
+      "ok": true,
+      "requested_footprint": "c2316_conn_th_xh_3a",
+      "native_footprint": "c2316_conn_th_xh_3a",
+      "comparison": {
+        "pin_count": 3,
+        "max_pin_center_error_mm": 2.3306280950291525e-16,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "C9160",
+      "ok": false,
+      "requested_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "native_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "comparison": null,
+      "error": "Allegro place exited with 3221225477; see acceptance.json",
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "C581080",
+      "ok": true,
+      "requested_footprint": "c581080_bga_44_l15_0_w_79f771ec",
+      "native_footprint": "c581080_bga_44_l15_0_w_79f771ec",
+      "comparison": {
+        "pin_count": 44,
+        "max_pin_center_error_mm": 1.7763568394002505e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "C9160_reproduce",
+      "ok": true,
+      "requested_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "native_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "C9160_diagnostic",
+      "ok": true,
+      "requested_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "native_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "upper_1",
+      "ok": false,
+      "requested_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
+      "native_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
+      "comparison": null,
+      "error": "Native place process did not exit within 90 seconds after saving the independent board.",
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "upper_2",
+      "ok": true,
+      "requested_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
+      "native_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
+      "comparison": {
+        "pin_count": 2,
+        "max_pin_center_error_mm": 0.0,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "fpc_1",
+      "ok": true,
+      "requested_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "native_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    },
+    {
+      "case": "fpc_2",
+      "ok": true,
+      "requested_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "native_footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "error": null,
+      "source_files_still_unchanged": true
+    }
+  ]
+}

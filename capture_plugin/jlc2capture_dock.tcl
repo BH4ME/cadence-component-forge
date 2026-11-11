@@ -415,7 +415,7 @@ proc ::JLC2CaptureDock::finish {data} {
         }
         if {$operation ni {preview preview3d}} {
             ::JLC2Capture::validatePublishedAssets $data
-            ::JLC2Capture::buildOlb $data
+            dict set data olb_path [::JLC2Capture::buildOlb $data]
             ::JLC2Capture::registerFootprintPath $root [::JLC2Capture::get $data footprint_name]
         }
         set lastImport $data
