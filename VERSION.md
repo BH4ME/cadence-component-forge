@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`v0.47`
+`v0.48`
 
 ## Rules
 
@@ -14,6 +14,7 @@
 
 | Version | Date | Reason |
 |---|---|---|
+| `v0.48` | 2026-11-11 | Separate original 2D preview from on-demand STEP loading, cache prepared previews, recover local 3D rendering when viewer is unavailable, and register Capture/Allegro library paths. Include the Capture menu fix in rebuilt Windows installers. Validation details: docs/releases/v0.48.0.md. |
 | `v0.47` | 2026-11-10 | Windows candidate r7 rebuilt after fixing concurrent STEP preview publication on Windows; signed update, installer lifecycle, Capture/Allegro evidence and performance acceptance were renewed. Production feed and Cadence 17.2 native host remain external prerequisites. |
 | `v0.46` | 2026-11-09 | Completed the 478-leaf electronic category matrix with resumable isolated native preparation and truthful source/conversion failure records; the generated ledger and Chinese report preserve the verification limits. |
 | `v0.45` | 2026-11-09 | Added the official electronic leaf-category conversion matrix, resumable isolated native builds, independent Capture/Allegro readback and evidence validation. Fixed a proven shared STEP-cache partial-write race and Capture's native property-length crash by preserving oversized metadata in hashed sidecar reports. Full matrix results and verification limits are recorded in 独立分类验收记录. |

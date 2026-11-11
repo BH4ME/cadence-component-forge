@@ -1,6 +1,6 @@
 # JLC/LCSC Cadence 扩展 Windows 使用说明
 
-版本：0.47.0。安装程序包含 Python、转换依赖和界面资源，使用者不需要另装
+版本：0.48.0。安装程序包含 Python、转换依赖和界面资源，使用者不需要另装
 Python、Node.js 或 Codex。Cadence Capture 和 Allegro 需要自行安装。
 
 当前已发现并实测 Cadence 17.4；安装程序支持选择 17.2 和 17.4，
@@ -8,7 +8,7 @@ Python、Node.js 或 Codex。Cadence Capture 和 Allegro 需要自行安装。
 
 ## 安装与打开
 
-1. 运行发布包中的 `JLC2Cadence-0.47.0-Setup.exe`。
+1. 运行发布包中的 `JLC2Cadence-0.48.0-Setup.exe`。
 2. 选择已安装的 Cadence 根目录，例如 `C:\Cadence\SPB_17.4`。
    程序检查实际可执行文件版本，不会将缺少的 17.2 自动替换成 17.4。
 3. 选择元件库保存目录。安装程序不需要打开、修改或保存现有工程。
@@ -32,8 +32,11 @@ Python、Node.js 或 Codex。Cadence Capture 和 Allegro 需要自行安装。
 插件完全消除。已完成元件的预览和资源也按内容指纹复用，不会每次点击都重新生成。
 已经下载过的元件再次按 C 编号搜索时直接读取本地官方记录，不再重复访问网络；
 首次关键词查询仍受立创服务器响应时间影响，后续相同查询会优先使用缓存。
-Windows 版后台 worker 使用 `pythonw.exe` 和无窗口子进程，因此搜索、预览和导入不会
-弹出黑色 CMD 窗口。
+CEF 内嵌面板点击元件先显示原始符号和封装的二维预览，STEP 下载与网格生成由 **加载 3D** 按钮按需触发。
+二维预览也有独立缓存，重复选择无需等待三维生成；加载时可以切换元件，过期响应不会覆盖新选择。
+Tk 备用窗口仍使用原有的完整 STEP 准备流程。
+后台 worker 统一选择 `pythonw.exe`；缺少无窗口运行时时明确提示修复安装。
+外部三维预览服务不可用时，程序回退到随安装包提供的本地 STEP 预览组件。
 
 若检测到另一个安装目录或开发版留下的同名初始化文件，安装会明确报错。
 不要直接覆盖未知文件。迁移应先备份已确认属于本扩展的初始化文件，并在失败时恢复。
@@ -56,7 +59,9 @@ Windows 版后台 worker 使用 `pythonw.exe` 和无窗口子进程，因此搜�
 | `allegro_paths.env` | Allegro 的 psmpath、padpath、steppath 配置参考 |
 | `parts/.../reports/source_provenance.json` | 源记录、转换来源及原始 STEP 哈希 |
 
-在 Allegro 中把相应 symbols、padstacks、3d 文件夹加入库路径。
+0.48.0 会在打开插件及导入完成后登记 Capture 封装路径，并在资源导入完成时登记 Allegro 的
+`psmpath`、`padpath`、`steppath`，保留已有路径并备份被修改的环境文件。已运行的 Allegro
+需要重新启动以读取新设置；权限不足等登记失败会明确写入警告。
 Capture 的 `PCB Footprint` 属性填写生成的封装名，不带 `.psm` 后缀。
 
 Capture 编辑的是原理图符号和 `PCB Footprint` 关联属性；实际焊盘、丝印等
@@ -82,13 +87,13 @@ STEP 预览只对原始文件进行三角网格显示和必要的单位/坐标�
 
 0.47.0 的菜单启用回调错误地返回了数字 `1`。Capture 的菜单 Update 回调要求
 返回 `true` 或 `false`，因此“Search Components...”和“Check for Updates...”会一起禁用。
-修复版源码已将菜单 Update 回调与动作处理的前置判断分开。
+0.48.0 安装包已包含修复，将菜单 Update 回调与动作处理的前置判断分开。
 
 已经打开的 Capture 会继续使用旧回调。更新插件源码后，保存工作并重启 Capture 即可加载修复。
 也可以在当前会话选择 **View → Command Window**，输入下面一行并按 Enter：
 
 ```tcl
-proc ::JLC2Capture::enabled {args} { return true }; RefreshMenu
+proc ::JLC2Capture::menuEnabled {args} { return true }; RefreshMenu
 ```
 
 这条临时修复只更新菜单回调，不修改工程或元件库；使用旧安装包时下次启动仍需重新执行。
@@ -129,7 +134,8 @@ Capture 中打开 `JLC/LCSC → Check for Updates...`，或点击内嵌页面的
 ## 测试记录如何阅读
 
 旧版完整 478 分类记录在 仓库外的独立分类验收目录。
-0.47.0 新版验收记录在 独立发布验收记录，
+0.48.0 修复和验收结果见 [发布说明](releases/v0.48.0.md)。
+0.47.0 的历史验收保留在独立发布验收记录，
 Windows 安装/升级/卸载记录在 隔离安装器测试目录。
 脚本调用 Cadence 的编辑、保存、重新打开记录，与鼠标手动编辑验证分开记录；
 不能把原生脚本测试等同于手动界面验证。部分通过也不代表全图形顶点或生产制造签核。

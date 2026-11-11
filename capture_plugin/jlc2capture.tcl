@@ -39,6 +39,12 @@ namespace eval ::JLC2Capture {
     variable pageLabel "1"
     variable resultCount ""
     variable searchQuery ""
+    variable pathChannel ""
+    variable pathResponse ""
+    variable pathOperationKey {}
+    variable pathRegisteredKey {}
+    variable pathWarning ""
+    variable capturePathWarning ""
 }
 
 proc ::JLC2Capture::get {data key {fallback ""}} {
@@ -47,18 +53,155 @@ proc ::JLC2Capture::get {data key {fallback ""}} {
 }
 
 proc ::JLC2Capture::workerPython {} {
-    # ``open |`` is asynchronous and must not create a console window on
-    # Windows.  Prefer the paired pythonw executable when the configured
-    # interpreter is a normal CPython executable; keep custom interpreters and
-    # non-Windows hosts untouched.  The worker still writes its JSON response to
-    # the same file, so no console stream is needed by Capture.
+    # Resolve bare interpreter names as well as configured absolute paths.
+    # Falling back to python.exe when pythonw is missing opens a console in
+    # Capture; report that configuration error instead of silently doing so.
     variable python
     if {$::tcl_platform(platform) ne "windows"} { return [string cat $python] }
-    set tail [string tolower [file tail $python]]
-    if {$tail ne "python.exe"} { return [string cat $python] }
-    set candidate [file join [file dirname $python] pythonw.exe]
+    set executable [string cat $python]
+    if {[file pathtype $executable] ne "absolute"} {
+        set resolved [auto_execok $executable]
+        if {[llength $resolved] == 1} { set executable [lindex $resolved 0] }
+    }
+    set tail [string tolower [file tail $executable]]
+    if {$tail ni {python python.exe python3 python3.exe}} { return [string cat $executable] }
+    set candidate [file join [file dirname $executable] pythonw.exe]
     if {[file isfile $candidate]} { return [string cat $candidate] }
-    return [string cat $python]
+    error "Python's windowless runtime (pythonw.exe) is missing. Repair the plugin installation or configure a Python installation with pythonw.exe."
+}
+
+# Use Capture's own directory-registration API so the live footprint viewer
+# and Capture.ini agree. It appends to the user's existing directory list.
+proc ::JLC2Capture::registerFootprintPath {{root ""} {footprint ""}} {
+    variable libraryRoot
+    if {$root eq ""} { set root $libraryRoot }
+    set directory [file normalize [file join $root allegro symbols]]
+    if {![file isdirectory $directory]} { return 0 }
+    if {$footprint ne ""} {
+        if {[file tail $footprint] ne $footprint} { error "Invalid footprint name" }
+        foreach extension {dra psm} {
+            set path [file join $directory "[string tolower $footprint].$extension"]
+            if {![file isfile $path] || [file size $path] == 0} {
+                error "Generated footprint file is missing: $path"
+            }
+        }
+    } elseif {![llength [glob -nocomplain -directory $directory *.dra]]} {
+        return 0
+    }
+    if {![llength [info commands capSetFootPrintPathToCaptureINI]]} { return 0 }
+    capSetFootPrintPathToCaptureINI $directory
+    return 1
+}
+
+proc ::JLC2Capture::requireTk {} {
+    # Hide only the implicit root created by this plugin's first Tk load.
+    # Existing Tk roots owned by another Capture extension are left alone.
+    set hadTk [expr {[llength [info commands winfo]] > 0}]
+    package require Tk 8.5
+    if {!$hadTk} { wm withdraw . }
+}
+
+proc ::JLC2Capture::pathRegistrationWarning {message} {
+    variable pathWarning
+    variable status
+    set pathWarning $message
+    set status $message
+    puts "JLC2Capture library paths: $message"
+    if {[llength [info commands ::JLC2CaptureDock::emit]] &&
+        [info exists ::JLC2CaptureDock::widget] && $::JLC2CaptureDock::widget != 0} {
+        package require json::write
+        ::JLC2CaptureDock::emit paths [::json::write object ok false message [::json::write string $message]]
+    }
+}
+
+proc ::JLC2Capture::registerLibraryPaths {} {
+    variable libraryRoot
+    variable cadenceRoot
+    variable projectRoot
+    variable pathChannel
+    variable pathResponse
+    variable pathOperationKey
+    variable pathRegisteredKey
+    if {$pathChannel ne ""} { return }
+    set key [list [file normalize $libraryRoot] $cadenceRoot]
+    if {$key eq $pathRegisteredKey} { return }
+    if {![llength [glob -nocomplain -directory [file join $libraryRoot allegro symbols] *.dra]]} { return }
+    if {[catch {
+        set directory [file join $libraryRoot .capture_jobs]
+        file mkdir $directory
+        set pathResponse [file join $directory "paths_[pid]_[clock microseconds].json"]
+        set command [list [workerPython] -u -m jlc2cadence.capture_bridge register-paths --library-root $libraryRoot --output $pathResponse]
+        if {$cadenceRoot ne ""} { lappend command --cadence-root $cadenceRoot }
+        set saved [dict create]
+        foreach name {PYTHONPATH PYTHONIOENCODING} {
+            if {[info exists ::env($name)]} { dict set saved $name $::env($name) }
+        }
+        set ::env(PYTHONPATH) [file join $projectRoot src]
+        if {[dict exists $saved PYTHONPATH] && [dict get $saved PYTHONPATH] ne ""} {
+            append ::env(PYTHONPATH) [expr {$::tcl_platform(platform) eq "windows" ? ";" : ":"}] [dict get $saved PYTHONPATH]
+        }
+        set ::env(PYTHONIOENCODING) utf-8
+        set failed [catch {set pathChannel [open [concat [list |] $command [list 2>@1]] r]} message options]
+        foreach name {PYTHONPATH PYTHONIOENCODING} {
+            if {[dict exists $saved $name]} { set ::env($name) [dict get $saved $name] } else { unset ::env($name) }
+        }
+        if {$failed} { return -options $options $message }
+        set pathOperationKey $key
+        fconfigure $pathChannel -blocking 0 -encoding utf-8 -translation auto
+        fileevent $pathChannel readable ::JLC2Capture::receiveLibraryPaths
+    } message]} { pathRegistrationWarning $message }
+}
+
+proc ::JLC2Capture::configureLibraryPaths {} {
+    variable capturePathWarning
+    set capturePathWarning ""
+    if {[catch {registerFootprintPath} message]} {
+        set capturePathWarning $message
+        pathRegistrationWarning $message
+    }
+    registerLibraryPaths
+}
+
+proc ::JLC2Capture::receiveLibraryPaths {} {
+    variable pathChannel
+    variable pathResponse
+    variable pathOperationKey
+    variable pathRegisteredKey
+    variable pathWarning
+    variable capturePathWarning
+    variable libraryRoot
+    variable cadenceRoot
+    if {$pathChannel eq ""} { return }
+    set readFailed [catch {read $pathChannel 65536} text]
+    if {!$readFailed && ![eof $pathChannel]} { return }
+    catch {fileevent $pathChannel readable {}}
+    set failed [catch {close $pathChannel} closeMessage]
+    set pathChannel ""
+    if {[catch {
+        if {$readFailed} { error $text }
+        set data [readJson $pathResponse]
+        if {![get $data ok 0]} { error [backendError $data] }
+        if {$failed} { error $closeMessage }
+        set registration [get $data path_registration]
+        set state [get $registration status]
+        if {$state eq "registered"} {
+            set pathRegisteredKey $pathOperationKey
+            set pathWarning $capturePathWarning
+        } elseif {$state ne "missing_assets"} {
+            error "Unable to register the Allegro library paths: $state"
+        }
+    } message]} { pathRegistrationWarning $message }
+    if {$pathOperationKey ne [list [file normalize $libraryRoot] $cadenceRoot]} {
+        after 0 ::JLC2Capture::registerLibraryPaths
+    }
+}
+
+proc ::JLC2Capture::validatePublishedAssets {data} {
+    foreach path [get $data published_files {}] {
+        if {![file isfile $path] || [file size $path] == 0} {
+            error "Generated library file is missing or empty: $path"
+        }
+    }
 }
 
 proc ::JLC2Capture::backendError {data} {
@@ -182,6 +325,7 @@ proc ::JLC2Capture::configure {} {
         set imported [dict create]
         showPreviews [dict create]
     }
+    configureLibraryPaths
 }
 
 proc ::JLC2Capture::enabled {args} { return 1 }
@@ -207,7 +351,7 @@ proc ::JLC2Capture::show {args} {
     variable window
     variable query
     variable status
-    if {[catch {package require Tk 8.5} message]} {
+    if {[catch {requireTk} message]} {
         puts "JLC2Capture: $message"
         if {[llength [info commands COrSmiUtils_sShowMessageBox]]} {
             COrSmiUtils_sShowMessageBox $message JLC2Capture 16
@@ -339,7 +483,10 @@ proc ::JLC2Capture::chooseRoot {} {
     variable window
     variable libraryRoot
     set path [tk_chooseDirectory -parent $window -initialdir $libraryRoot -mustexist 0]
-    if {$path ne ""} { set libraryRoot $path }
+    if {$path ne ""} {
+        set libraryRoot $path
+        configureLibraryPaths
+    }
 }
 
 proc ::JLC2Capture::openRoot {} {
@@ -421,7 +568,7 @@ proc ::JLC2Capture::start {kind arguments} {
         set jobDir [file join $libraryRoot .capture_jobs]
         file mkdir $jobDir
         set responseFile [file join $jobDir "[pid]_[clock microseconds].json"]
-        set command [list $python -u -m jlc2cadence.capture_bridge $kind {*}$arguments --library-root $libraryRoot --output $responseFile]
+        set command [list [workerPython] -u -m jlc2cadence.capture_bridge $kind {*}$arguments --library-root $libraryRoot --output $responseFile]
         if {$kind eq "import" && $cadenceRoot ne ""} { lappend command --cadence-root $cadenceRoot }
         if {$kind eq "import" && $viewerBaseUrl ne ""} { lappend command --viewer-base-url $viewerBaseUrl }
         set oldPath [expr {[info exists ::env(PYTHONPATH)] ? $::env(PYTHONPATH) : ""}]
@@ -867,7 +1014,9 @@ proc ::JLC2Capture::finishImport {data} {
     if {$::tcl_platform(platform) eq "windows"} { set sameRoot [string equal -nocase $responseRoot $operationRoot] }
     if {!$sameRoot} { error "Import response library folder does not match the requested folder" }
     if {![sourceExactResult $data]} { error "Import response conversion_policy must be source_exact; import this part again with the current converter" }
+    validatePublishedAssets $data
     set olb [buildOlb $data]
+    registerFootprintPath $responseRoot [get $data footprint_name]
     set symbol [get $data symbol_name]
     if {$symbol eq ""} { error "Backend response is missing symbol_name" }
     set key [list $responseRoot $responsePart]

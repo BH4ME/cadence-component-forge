@@ -43,7 +43,7 @@
         if (kind !== 'init' && !state.connected) { return false; }
         if (!bridgeReady()) { connectionFailed('Capture \u8fde\u63a5\u4e0d\u53ef\u7528\uff0c\u8bf7\u91cd\u65b0\u8fde\u63a5\u3002'); return false; }
         data = data || {};
-        if (['search', 'preview', 'import', 'place'].indexOf(kind) !== -1) {
+        if (['search', 'preview', 'preview3d', 'import', 'place'].indexOf(kind) !== -1) {
             state.pendingId = ++state.serial;
             data.request_id = state.pendingId;
         }
@@ -64,18 +64,22 @@
         state.busy = value;
         byId('progress').hidden = !value;
         var disabled = value || !state.connected;
-        byId('search').disabled = disabled;
+        var browsingDisabled = !state.connected || (value && !replaceable());
+        byId('search').disabled = browsingDisabled;
         byId('folder').disabled = !state.connected;
         byId('updates').disabled = disabled;
-        ['manufacturer', 'package', 'in-stock'].forEach(function (id) { byId(id).disabled = disabled; });
-        byId('previous').disabled = disabled || state.page <= 1;
-        byId('next').disabled = disabled || !state.more;
+        ['manufacturer', 'package', 'in-stock'].forEach(function (id) { byId(id).disabled = browsingDisabled; });
+        byId('previous').disabled = browsingDisabled || state.page <= 1;
+        byId('next').disabled = browsingDisabled || !state.more;
         byId('import').disabled = disabled || !state.selected;
         byId('place').disabled = disabled || !state.selected;
         byId('view-step').disabled = disabled || !state.preview || !(state.preview.preview_3d || state.preview.step_viewer_url || (state.preview.step_files || []).length);
+        byId('load-step').hidden = !state.preview || state.preview.step_status !== 'deferred';
+        byId('load-step').disabled = disabled;
     }
+    function replaceable() { return ['search', 'preview', 'preview3d'].indexOf(state.pending) !== -1; }
     function search(page, submitted) {
-        if (state.busy || !state.connected) { return; }
+        if ((state.busy && !replaceable()) || !state.connected) { return; }
         var query = submitted || !state.query ? byId('query').value.trim() : state.query;
         if (!query) { return; }
         state.query = query;
@@ -86,7 +90,7 @@
         var cached = state.searchCache[cacheKey];
         // An explicit submit is a refresh request; page navigation may use the
         // short-lived in-panel cache for an immediate response.
-        if (!submitted && cached && Date.now() - cached.time <= SEARCH_CACHE_TTL_MS) {
+        if (!submitted && !state.busy && cached && Date.now() - cached.time <= SEARCH_CACHE_TTL_MS) {
             renderSearchResult(cached.data, true);
             return;
         }
@@ -122,7 +126,12 @@
         byId('empty').hidden = filtered.length > 0;
         text('count', filtered.length + ' / ' + state.rows.length + '  \u00b7  ' + state.total);
         text('page', state.page);
-        if (state.selected && !filtered.some(function (row) { return row.lcsc_id === state.selected; })) { state.selected = ''; clearPreview(); clearDetails(); }
+        if (state.selected && !filtered.some(function (row) { return row.lcsc_id === state.selected; })) {
+            state.selected = ''; clearPreview(); clearDetails();
+            if (state.busy && replaceable()) {
+                state.pending = ''; state.pendingId = ++state.serial; state.busy = false;
+            }
+        }
         busy(state.busy);
     }
     function clearDetails() { ['part-title', 'part-id', 'description', 'part-manufacturer', 'part-package', 'step-status'].forEach(function (id) { text(id, ''); }); }
@@ -136,14 +145,14 @@
         status(fromCache ? '\u672c\u5730\u7f13\u5b58\uff08\u5feb\u901f\uff09' + (warning ? '\n' + warning : '') : warning);
     }
     function select(part) {
-        if (state.busy) { return; }
+        if ((state.busy && !replaceable()) || !state.connected || (state.busy && state.selected === part)) { return; }
         state.selected = part;
         clearPreview();
         var row = selectedRow();
         text('part-title', row.title || row.name); text('part-id', part); text('description', row.description); text('part-manufacturer', row.manufacturer); text('part-package', row.package); text('step-status', '...');
         renderRows();
         state.pending = 'preview';
-        busy(true); status('\u6b63\u5728\u51c6\u5907\u9884\u89c8...');
+        busy(true); status('\u6b63\u5728\u52a0\u8f7d\u539f\u59cb\u7b26\u53f7\u548c\u5c01\u88c5...');
         if (!request('preview', {part: part})) { busy(false); }
     }
     function importPart(kind) {
@@ -250,6 +259,13 @@
     }
     window.JLC2Dock = {
         receive: function (kind, encoded, requestId) {
+            if (kind === 'paths') {
+                try {
+                    var registration = decode(encoded);
+                    if (registration.ok === false) { status(registration.message || '\u5c01\u88c5\u641c\u7d22\u8def\u5f84\u767b\u8bb0\u5931\u8d25', true); }
+                } catch (error) { status(error.message, true); }
+                return;
+            }
             if (kind !== 'init' && requestId != null && requestId !== state.pendingId) { return; }
             if (kind !== 'init' && kind !== 'error' && kind !== state.pending) { return; }
             var data;
@@ -257,7 +273,7 @@
             if (kind === 'init') {
                 clearTimeout(connectionTimer); connectionTimer = null; connectionDeadline = 0;
                 state.connected = true; text('connection', 'Capture \u5df2\u8fde\u63a5'); byId('reconnect').hidden = true;
-                text('library-root', data.library_root); byId('library-root').title = data.library_root; busy(false); status(''); return;
+                text('library-root', data.library_root); byId('library-root').title = data.library_root; busy(false); status(data.path_warning || '', !!data.path_warning); return;
             }
             if (kind === 'error') {
                 state.pending = ''; busy(false);
@@ -273,9 +289,9 @@
             if (data.part_id !== state.selected) { return; }
             state.pending = '';
             state.preview = data; draw('symbol'); draw('footprint');
-            text('step-status', {available: '\u53ef\u7528', missing: '\u7f3a\u5931', mapping_failed: '\u5173\u8054\u5931\u8d25'}[data.step_status] || data.step_status);
+            text('step-status', {available: '\u53ef\u7528', missing: '\u7f3a\u5931', deferred: '\u6309\u9700\u52a0\u8f7d', mapping_failed: '\u5173\u8054\u5931\u8d25'}[data.step_status] || data.step_status);
             busy(false);
-            status((kind === 'preview' ? '' : data.footprint_name + '\n') + (data.warnings || []).join('\n'));
+            status((kind === 'preview' || kind === 'preview3d' ? '' : data.footprint_name + '\n') + (data.warnings || []).join('\n'));
             if (data.preview_3d && data.preview_3d.format === 'glb' && window.JLC3D) {
                 byId('no-step').hidden = true;
                 window.JLC3D.show(data.preview_3d, function (message) { byId('no-step').hidden = false; status(message, true); });
@@ -308,6 +324,11 @@
         byId('zoom-close').focus();
     }
     byId('view-step').onclick = function () { openZoom('step'); };
+    byId('load-step').onclick = function () {
+        if (state.busy || !state.selected || !state.preview) { return; }
+        state.pending = 'preview3d'; busy(true); status('\u6b63\u5728\u52a0\u8f7d\u539f\u59cb STEP\uff0c\u53ef\u7ee7\u7eed\u9009\u62e9\u5176\u4ed6\u5143\u4ef6...');
+        if (!request('preview3d', {part: state.selected})) { busy(false); }
+    };
     Array.prototype.forEach.call(document.querySelectorAll('[data-fit]'), function (button) { button.onclick = function () { openZoom(button.getAttribute('data-fit')); }; });
     byId('zoom-close').onclick = closeZoom;
     document.addEventListener('keydown', function (event) {

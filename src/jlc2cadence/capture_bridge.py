@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from contextlib import contextmanager
 from dataclasses import replace
 from http.client import HTTPException
@@ -23,7 +24,7 @@ from xml.etree import ElementTree
 
 from . import __version__
 from .native_geometry_errors import source_native_geometry_error
-from .extractors.easyeda_3d import fetch_easyeda_3d_models, write_easyeda_3d_fetch_report
+from .extractors.easyeda_3d import EasyEDA3DFetchReport, fetch_easyeda_3d_models, write_easyeda_3d_fetch_report
 from .generators.allegro_skill import source_refdes_report, write_allegro_outputs
 from .generators.capture import write_capture_outputs
 from .generators.model3d import write_model_map
@@ -483,7 +484,7 @@ def _add_compact_step_preview(result: dict[str, Any], root: Path, viewer_base_ur
         if preview is None and viewer_base_url:
             parsed = urlsplit(viewer_base_url)
             metadata_url = urlunsplit((parsed.scheme, parsed.netloc, "/__cad/server", "", ""))
-            metadata = _viewer_json(Request(metadata_url, headers={"Accept": "application/json"}), 5)
+            metadata = _viewer_json(Request(metadata_url, headers={"Accept": "application/json"}), 1)
             api = metadata.get("serverApiVersion")
             if (metadata.get("app") != "cad-viewer" or metadata.get("dynamicRoot") is not True
                     or type(api) is not int or api < 2):
@@ -508,13 +509,24 @@ def _add_compact_step_preview(result: dict[str, Any], root: Path, viewer_base_ur
         if preview is not None:
             result["preview_3d"] = preview
     except (OSError, ValueError, TypeError, KeyError, HTTPException, subprocess.SubprocessError) as exc:
+        if viewer_base_url and isinstance(exc, (OSError, HTTPException)) and "relative" in locals():
+            try:
+                _generate_local_step_preview(step, root)
+                preview = _read_step_glb(step, root)
+                if preview is None:
+                    raise ValueError("Local STEP preview worker did not produce a valid GLB")
+                result["preview_3d"] = preview
+                result["preview_renderer"] = "local_fallback"
+                return
+            except (OSError, ValueError, subprocess.SubprocessError) as fallback:
+                exc = ValueError(f"{exc}; local fallback: {fallback}")
         warning = f"Compact 3D preview unavailable: {exc}"
         warnings = result.setdefault("warnings", [])
         if warning not in warnings:
             warnings.append(warning)
 
 
-def _enrich_asset_previews(result: dict[str, Any], root: Path, build: Path, viewer_base_url: str) -> None:
+def _enrich_asset_previews(result: dict[str, Any], root: Path, build: Path, viewer_base_url: str, *, load_3d: bool = True) -> None:
     ir_path = build / "reports" / "library.ir.json"
     library = json.loads(ir_path.read_text(encoding="utf-8"))
     footprints = library.get("footprints", [])
@@ -542,7 +554,9 @@ def _enrich_asset_previews(result: dict[str, Any], root: Path, build: Path, view
         and path.stem.casefold() == result["footprint_name"].casefold()
     ), "")
     result["step_viewer_url"] = ""
-    _add_compact_step_preview(result, root, viewer_base_url)
+    result["preview_3d"] = {}
+    if load_3d:
+        _add_compact_step_preview(result, root, viewer_base_url)
     if viewer_base_url and result["step_files"]:
         try:
             relative = Path(result["step_files"][0]).relative_to(root)
@@ -562,13 +576,20 @@ def import_part(
     timeout: float = 20.0,
     prepare_only: bool = False,
     viewer_base_url: str = "",
+    defer_step: bool = False,
 ) -> dict[str, Any]:
+    started = time.perf_counter()
+    if defer_step and not prepare_only:
+        raise ValueError("STEP deferral is only supported for previews; imports always fetch original STEP data.")
     part_id = _part_id(part_id)
     viewer_base_url = _validate_viewer_base_url(viewer_base_url)
     root = root.expanduser().resolve()
     root.mkdir(parents=True, exist_ok=True)
+    if shutil.disk_usage(root).free < 64 * 1024 * 1024:
+        raise OSError("元件库所在磁盘空间不足（需要至少 64 MiB 可用空间），请清理磁盘或更换元件库目录后重试。")
     with _part_lock(root, part_id):
         library = _catalog(root, timeout).fetch_part(part_id)
+        timings = {"source_cad_seconds": round(time.perf_counter() - started, 3)}
         if len(library.components) != 1 or len(library.footprints) != 1:
             raise ValueError("A catalog part must contain exactly one symbol and one footprint.")
         namespace_part(library, part_id)
@@ -580,11 +601,38 @@ def import_part(
             (f"{__version__}:{BRIDGE_BUILD_REVISION}:{target_root.casefold()}:" + json.dumps(library.to_dict(), sort_keys=True)).encode("utf-8")
         ).hexdigest()[:16]
         # Content-addressed builds preserve already-loaded libraries and earlier imports.
-        build = root / "parts" / part_id / fingerprint
+        # Keep deferred 2D output separate from builds with real STEP bindings.
+        # Their model maps must never overwrite each other.
+        build = root / "parts" / part_id / (fingerprint + ("_2d" if defer_step else ""))
         build.mkdir(parents=True, exist_ok=True)
         reports = build / "reports"
         reports.mkdir(exist_ok=True)
         manifest_path = build / "capture_browser.json"
+        preview_manifest = build / "preview_browser.json"
+        if prepare_only and preview_manifest.is_file():
+            try:
+                existing = json.loads(preview_manifest.read_text(encoding="utf-8"))
+                required = [Path(existing["capture_xml"]), reports / "library.ir.json"]
+                required.extend(Path(item) for item in existing.get("step_files", []))
+                fresh = defer_step or existing.get("step_status") == "available" or time.time() - preview_manifest.stat().st_mtime < 300
+                identity_matches = (existing.get("part_id") == part_id and existing.get("version") == __version__
+                                    and existing.get("build_revision") == BRIDGE_BUILD_REVISION
+                                    and existing.get("cadence_target") == target_root)
+                step_hashes = {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+                               for path in map(Path, existing.get("step_files", []))}
+                step_matches = existing.get("preview_step_sha256", {}) == step_hashes
+                if (identity_matches and existing.get("ok") and existing.get("prepared_only") and fresh
+                        and step_matches and existing.get("preview_data")
+                        and all(path.is_file() and path.stat().st_size for path in required)):
+                    existing["cached"] = True
+                    # Revalidate external files and current viewer settings; an
+                    # embedded mesh from a previous response is not proof that
+                    # its original STEP or the viewer configuration is current.
+                    _enrich_asset_previews(existing, root, build, viewer_base_url, load_3d=not defer_step)
+                    existing["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
+                    return existing
+            except (OSError, ValueError, TypeError, KeyError, AttributeError):
+                pass
         # Preview requests use ``--prepare-only`` but may target a component that
         # was already fully imported.  Reuse the content-addressed manifest in
         # that case; rebuilding the same symbol/footprint on every row click was
@@ -594,8 +642,9 @@ def import_part(
             required = [Path(item) for item in existing.get("published_files", [])]
             if (existing.get("ok") and existing.get("asset_status", "complete") == "complete"
                     and existing.get("step_status") == "available" and required
-                    and Path(existing["capture_xml"]).is_file()
-                    and all(item.is_file() for item in required)):
+                    and Path(existing["capture_xml"]).is_file() and Path(existing["capture_xml"]).stat().st_size
+                    and (reports / "library.ir.json").is_file() and (reports / "library.ir.json").stat().st_size
+                    and all(item.is_file() and item.stat().st_size for item in required)):
                 existing["cached"] = True
                 _enrich_asset_previews(existing, root, build, viewer_base_url)
                 return existing
@@ -603,11 +652,16 @@ def import_part(
         warnings = [str(item) for item in validation.warnings if "has no padstack name" not in str(item)
                     and "has no linked 3D model" not in str(item)]
         warnings = list(dict.fromkeys([*library.warnings, *warnings]))
-        print(f"Downloading models for {part_id}", flush=True)
-        models = fetch_easyeda_3d_models(
-            library, build / "3d", formats=("step",),
-            cache_dir=root / "cache" / "3d", timeout=timeout,
-        )
+        model_started = time.perf_counter()
+        if defer_step:
+            models = EasyEDA3DFetchReport(output_dir=str(build / "3d"), formats=["step"])
+        else:
+            print(f"Downloading models for {part_id}", flush=True)
+            models = fetch_easyeda_3d_models(
+                library, build / "3d", formats=("step",),
+                cache_dir=root / "cache" / "3d", timeout=timeout,
+            )
+        timings["step_download_seconds"] = round(time.perf_counter() - model_started, 3)
         write_easyeda_3d_fetch_report(models, reports / "3d_fetch.json")
         attach_models(library, models.models)
         for footprint in library.footprints:
@@ -620,7 +674,7 @@ def import_part(
                 )
             elif footprint.model3d and footprint.properties.get("Conversion_Policy") == "source_exact":
                 footprint.model3d = replace(footprint.model3d, transform_source="missing_original")
-        step_status = "available" if library.footprints[0].model3d else "missing"
+        step_status = "deferred" if defer_step else "available" if library.footprints[0].model3d else "missing"
         if step_status == "missing":
             warnings.append("No downloadable STEP model is available for this part.")
         mapping_ready = bool(library.footprints[0].model3d and
@@ -656,7 +710,7 @@ def import_part(
             "library_root": str(root),
             "build_dir": str(build),
             "step_status": step_status,
-            "step_mapping_status": "ready" if mapping_ready else "missing_source_transform" if step_status == "available" else "missing_step",
+            "step_mapping_status": "deferred" if defer_step else "ready" if mapping_ready else "missing_source_transform" if step_status == "available" else "missing_step",
             "asset_status": "prepared" if prepare_only else "pending",
             "allegro_status": "not_built",
             "warnings": warnings,
@@ -669,7 +723,11 @@ def import_part(
             },
         }
         if prepare_only:
-            _enrich_asset_previews(result, root, build, viewer_base_url)
+            _enrich_asset_previews(result, root, build, viewer_base_url, load_3d=not defer_step)
+            result["preview_step_sha256"] = {path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                                             for path in result.get("step_files", [])}
+            result["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
+            write_response(preview_manifest, result)
             return result
 
         tools = CadenceTools.discover(cadence_root)
@@ -738,15 +796,30 @@ def import_part(
         write_response(provenance, provenance_data)
         _enrich_asset_previews(result, root, build, viewer_base_url)
         write_allegro_paths(root)
+        result["timings"] = {**timings, "total_seconds": round(time.perf_counter() - started, 3)}
         write_response(manifest_path, result)
         write_response(root / "parts" / part_id / "latest.json", result)
         return result
 
 
+def _register_library_paths(result: dict[str, Any], root: Path, cadence_root: Path | None) -> None:
+    from .library_paths import register_allegro_paths
+
+    try:
+        result["path_registration"] = register_allegro_paths(root, cadence_root)
+        status = result["path_registration"].get("status")
+        if status in {"environment_unavailable", "missing_assets"}:
+            message = ("无法找到 Allegro 用户配置目录，请在 PCB Editor 中检查元件库搜索路径。"
+                       if status == "environment_unavailable" else "封装库文件不完整，未自动登记搜索路径，请查看导入结果中的缺失资源。")
+            result.setdefault("warnings", []).append(message)
+    except (OSError, ValueError, RuntimeError) as exc:
+        result.setdefault("warnings", []).append(f"封装库已生成，但自动登记搜索路径失败：{exc}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ("search", "import"):
+    for command in ("search", "import", "register-paths"):
         item = sub.add_parser(command)
         item.add_argument("--library-root", required=True, type=Path)
         item.add_argument("--output", required=True, type=Path)
@@ -755,11 +828,14 @@ def build_parser() -> argparse.ArgumentParser:
             item.add_argument("--query", required=True)
             item.add_argument("--page", type=int, default=1)
             item.add_argument("--limit", type=int, default=30)
-        else:
+        elif command == "import":
             item.add_argument("--part", required=True)
             item.add_argument("--cadence-root", type=Path)
             item.add_argument("--prepare-only", action="store_true")
+            item.add_argument("--defer-step", action="store_true")
             item.add_argument("--viewer-base-url", default="")
+        else:
+            item.add_argument("--cadence-root", type=Path)
     return parser
 
 
@@ -771,12 +847,18 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("Timeout must be between 0 and 120 seconds.")
         if args.command == "search":
             result = search_parts(args.query, args.library_root.resolve(), args.timeout, page=args.page, limit=args.limit)
+        elif args.command == "register-paths":
+            from .library_paths import register_allegro_paths
+            result = {"ok": True, "path_registration": register_allegro_paths(args.library_root, args.cadence_root)}
         else:
             result = import_part(
                 args.part, args.library_root, cadence_root=args.cadence_root,
                 timeout=args.timeout, prepare_only=args.prepare_only,
                 viewer_base_url=args.viewer_base_url,
+                defer_step=args.defer_step,
             )
+            if not args.prepare_only:
+                _register_library_paths(result, args.library_root, args.cadence_root)
     except Exception as exc:
         result = failure_response(exc)
     write_response(args.output, result)

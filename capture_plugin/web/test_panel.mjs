@@ -307,25 +307,84 @@ test('manufacturer, package and stock filters compose without treating unknown s
     assert.deepEqual(app.requests.map((item) => item.kind), ['init', 'search']);
 });
 
-test('selecting one row previews only that part and blocks duplicate operations while busy', () => {
+test('preview keeps browsing responsive while native import and placement stay disabled', () => {
     const app = panel();
     loadRows(app);
     choose(app, 'C100');
     assert.deepEqual(app.requests.at(-1), { kind: 'preview', data: { part: 'C100', request_id: 2 } });
     assert.equal(app.element('progress').hidden, false);
-    for (const id of ['search', 'next', 'previous', 'import', 'place', 'view-step', 'manufacturer', 'package', 'in-stock']) {
+    for (const id of ['import', 'place', 'view-step']) {
         assert.equal(app.element(id).disabled, true, `${id} disabled during preview`);
     }
     const count = app.requests.length;
     app.element('import').onclick();
     app.element('place').onclick();
-    app.submit('changed');
     assert.equal(app.requests.length, count);
+    for (const id of ['search', 'manufacturer', 'package', 'in-stock']) { assert.equal(app.element(id).disabled, false); }
     app.receive('preview', preview());
     assert.equal(app.element('progress').hidden, true);
     assert.equal(app.element('place').disabled, false);
     app.element('import').onclick();
     assert.deepEqual(app.requests.at(-1), { kind: 'import', data: { part: 'C100', request_id: 3 } });
+});
+
+test('new selection supersedes a pending preview and its late error cannot clear the new state', () => {
+    const app = panel();
+    loadRows(app);
+    choose(app, 'C100');
+    const oldId = app.requests.at(-1).data.request_id;
+    choose(app, 'C200');
+    const currentId = app.requests.at(-1).data.request_id;
+    assert.deepEqual(app.requests.at(-1), {kind: 'preview', data: {part: 'C200', request_id: currentId}});
+    app.receive('preview', preview('C100'), oldId);
+    app.receive('error', {message: 'old failure'}, oldId);
+    assert.equal(app.element('part-id').textContent, 'C200');
+    assert.equal(app.element('progress').hidden, false);
+    app.receive('preview', preview('C200'), currentId);
+    assert.equal(app.element('progress').hidden, true);
+});
+
+test('3D download is explicit and changing selection supersedes it', () => {
+    const app = panel();
+    loadRows(app);
+    choose(app, 'C100');
+    app.receive('preview', {...preview(), step_status: 'deferred'});
+    assert.equal(app.element('load-step').hidden, false);
+    assert.equal(app.requests.at(-1).kind, 'preview');
+    app.element('load-step').onclick();
+    const oldId = app.requests.at(-1).data.request_id;
+    assert.deepEqual(app.requests.at(-1), {kind: 'preview3d', data: {part: 'C100', request_id: oldId}});
+    choose(app, 'C200');
+    app.receive('preview3d', {...preview(), preview_3d: {format: 'glb'}}, oldId);
+    assert.equal(app.element('part-id').textContent, 'C200');
+    assert.equal(app.threeCalls.filter((call) => call.kind === 'show').length, 0);
+});
+
+test('new search can supersede a pending preview', () => {
+    const app = panel();
+    loadRows(app);
+    choose(app, 'C100');
+    const oldId = app.requests.at(-1).data.request_id;
+    app.submit('new query');
+    assert.equal(app.requests.at(-1).kind, 'search');
+    app.receive('preview', preview(), oldId);
+    assert.equal(app.element('progress').hidden, false);
+    app.receive('search', searchResult({query: 'new query'}));
+    assert.equal(app.element('progress').hidden, true);
+});
+
+test('asynchronous library path warning does not finish or unlock an active import', () => {
+    const app = panel();
+    loadRows(app);
+    choose(app, 'C100');
+    app.receive('preview', preview());
+    app.element('import').onclick();
+    app.receive('paths', {ok: false, message: 'Library path unavailable'});
+    assert.equal(app.element('status').textContent, 'Library path unavailable');
+    assert.equal(app.element('progress').hidden, false);
+    assert.equal(app.element('place').disabled, true);
+    app.receive('import', preview());
+    assert.equal(app.element('progress').hidden, true);
 });
 
 test('source failures display Chinese import messages and release the pending operation', () => {
@@ -385,6 +444,21 @@ test('filtering a selected row out clears its preview and disables part actions'
     assert.equal(app.element('import').disabled, true);
     assert.equal(app.element('place').disabled, true);
     assert.equal(app.element('step-preview').hidden, true);
+});
+
+test('filtering out a loading selection cancels its UI wait and rejects its late response', () => {
+    const app = panel();
+    loadRows(app);
+    choose(app, 'C100');
+    const oldId = app.requests.at(-1).data.request_id;
+    app.element('manufacturer').value = 'Maker B';
+    app.element('manufacturer').onchange();
+    assert.equal(app.element('progress').hidden, true);
+    assert.equal(app.element('import').disabled, true);
+    app.receive('preview', preview(), oldId);
+    assert.equal(app.element('import').disabled, true);
+    choose(app, 'C200');
+    assert.equal(app.requests.at(-1).data.part, 'C200');
 });
 
 test('a preview for another part cannot release the active request busy state', () => {

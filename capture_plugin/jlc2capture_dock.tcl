@@ -18,6 +18,7 @@ namespace eval ::JLC2CaptureDock {
     variable outputText ""
     variable lastImport [dict create]
     variable fallbackReason ""
+    variable queuedRequest {}
 }
 
 proc ::JLC2CaptureDock::cefAvailable {} {
@@ -144,6 +145,8 @@ proc ::JLC2CaptureDock::showCef {} {
 proc ::JLC2CaptureDock::closed {args} {
     variable widget
     variable widgetType
+    variable queuedRequest
+    set queuedRequest {}
     if {$widget == 0} { return }
     set closing $widget
     set widget 0
@@ -227,7 +230,7 @@ proc ::JLC2CaptureDock::reportError {message {requestId ""}} {
 proc ::JLC2CaptureDock::request {kind payload {clientId ""}} {
     variable channel
     variable lastImport
-    if {$kind ni {init search preview import place folder step updates}} { return "unsupported" }
+    if {$kind ni {init search preview preview3d import place folder step updates}} { return "unsupported" }
     if {[string length $payload] > 8192 || ![regexp {^[A-Za-z0-9+/=]*$} $payload]} { return "invalid" }
     set requestId ""
     set result "accepted"
@@ -247,9 +250,10 @@ proc ::JLC2CaptureDock::request {kind payload {clientId ""}} {
         }
         if {$candidateId ne ""} { set requestId [expr {wide($candidateId)}] }
         if {$kind eq "init"} {
-            emit init [::json::write object library_root [::json::write string $::JLC2Capture::libraryRoot]] $requestId
+            emit init [::json::write object library_root [::json::write string $::JLC2Capture::libraryRoot] \
+                path_warning [::json::write string $::JLC2Capture::pathWarning]] $requestId
             set result "ready"
-        } elseif {$channel ne ""} {
+        } elseif {$channel ne "" && $kind ni {search preview preview3d}} {
             set result "busy"
         } else {
           switch -- $kind {
@@ -269,17 +273,18 @@ proc ::JLC2CaptureDock::request {kind payload {clientId ""}} {
                 set page [::JLC2Capture::get $data page 1]
                 if {[string length $query] < 1 || [string length $query] > 200} { ::error "Invalid search query" }
                 if {![string is integer -strict $page] || $page < 1 || $page > 100000} { ::error "Invalid search page" }
-                start search [list --query $query --page $page --limit 30] $requestId
+                set result [start search [list --query $query --page $page --limit 30] $requestId]
             }
             default {
                 set part [string toupper [::JLC2Capture::get $data part]]
                 if {![regexp {^C[0-9]{3,}$} $part]} { ::error "Invalid LCSC part number" }
                 set arguments [list --part $part]
-                if {$kind eq "preview"} { lappend arguments --prepare-only }
+                if {$kind in {preview preview3d}} { lappend arguments --prepare-only }
+                if {$kind eq "preview"} { lappend arguments --defer-step }
                 if {$kind eq "place"} {
-                    start $kind $arguments $requestId [placementTarget]
+                    set result [start $kind $arguments $requestId [placementTarget]]
                 } else {
-                    start $kind $arguments $requestId
+                    set result [start $kind $arguments $requestId]
                 }
             }
           }
@@ -297,6 +302,16 @@ proc ::JLC2CaptureDock::start {kind arguments {requestId ""} {destination {}}} {
     variable outputText
     variable operationId
     variable operationTarget
+    variable queuedRequest
+    if {$channel ne ""} {
+        if {$kind in {search preview preview3d} && $operation in {search preview preview3d}} {
+            # Only the newest selection matters. Let the in-flight read-only
+            # preparation finish safely, then discard its obsolete response.
+            set queuedRequest [list $kind $arguments $requestId $destination]
+            return "queued"
+        }
+        return "busy"
+    }
     set operationTarget [dict create]
     if {$kind eq "place"} {
         if {$destination eq ""} { set destination [placementTarget] }
@@ -336,6 +351,18 @@ proc ::JLC2CaptureDock::start {kind arguments {requestId ""} {destination {}}} {
     if {$failed} { return -options $options $message }
     fconfigure $channel -blocking 0 -encoding utf-8 -translation auto
     fileevent $channel readable ::JLC2CaptureDock::receive
+    return "accepted"
+}
+
+proc ::JLC2CaptureDock::startQueued {} {
+    variable queuedRequest
+    if {![llength $queuedRequest]} { return 0 }
+    set arguments $queuedRequest
+    set queuedRequest {}
+    if {[catch {start {*}$arguments} message]} {
+        reportError $message [lindex $arguments 2]
+    }
+    return 1
 }
 
 proc ::JLC2CaptureDock::receive {} {
@@ -349,6 +376,7 @@ proc ::JLC2CaptureDock::receive {} {
         catch {fileevent $channel readable {}}
         catch {close $channel}
         set channel ""
+        if {[startQueued]} { return }
         reportError $text $operationId
         return
     }
@@ -358,6 +386,7 @@ proc ::JLC2CaptureDock::receive {} {
     fileevent $channel readable {}
     set failed [catch {close $channel} closeMessage]
     set channel ""
+    if {[startQueued]} { return }
     if {[catch {
         set data [::JLC2Capture::readJson $responseFile]
         if {![::JLC2Capture::get $data ok 0]} { ::error [::JLC2Capture::backendError $data] }
@@ -384,7 +413,11 @@ proc ::JLC2CaptureDock::finish {data} {
             set lastImport [dict create]
             ::error "Import response conversion_policy must be source_exact; import this part again with the current converter"
         }
-        if {$operation ne "preview"} { ::JLC2Capture::buildOlb $data }
+        if {$operation ni {preview preview3d}} {
+            ::JLC2Capture::validatePublishedAssets $data
+            ::JLC2Capture::buildOlb $data
+            ::JLC2Capture::registerFootprintPath $root [::JLC2Capture::get $data footprint_name]
+        }
         set lastImport $data
     }
     set stream [open $responseFile r]

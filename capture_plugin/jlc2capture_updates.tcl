@@ -19,7 +19,7 @@ proc ::JLC2CaptureUpdates::show {args} {
         return
     }
     if {[catch {
-        package require Tk 8.5
+        ::JLC2Capture::requireTk
         if {![dict size $::JLC2Capture::configuration]} { ::JLC2Capture::configure }
         toplevel $window
         wm title $window "JLC/LCSC - \u6269\u5c55\u66f4\u65b0"
