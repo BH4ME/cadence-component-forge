@@ -109,6 +109,7 @@ class CaptureOlbIntegrityTests(unittest.TestCase):
         self.tcl.setvar("::rebuiltOlb", str(replacement))
         self.tcl.eval("""
             proc ::JLC2Capture::buildOlb {data} {return $::rebuiltOlb}
+            proc ::JLC2Capture::placementOlbPath {path} {return "$path.native"}
             proc ::JLC2Capture::validatePublishedAssets {data} {}
             proc ::JLC2Capture::registerFootprintPath {args} {}
             proc ::JLC2CaptureDock::activateTarget {target} {}
@@ -121,7 +122,7 @@ class CaptureOlbIntegrityTests(unittest.TestCase):
         data = self.tcl.call("dict", "create", "olb_path", str(self.olb), "symbol_name", "PART", "part_id", "C1234",
                              "library_root", str(self.root), "conversion_policy", "source_exact")
         self.tcl.call("::JLC2CaptureDock::finish", data)
-        self.assertEqual(Path(str(self.tcl.getvar("::placed")[0])), replacement)
+        self.assertEqual(str(self.tcl.getvar("::placed")[0]), str(replacement) + ".native")
         self.assertEqual(Path(str(self.tcl.call("dict", "get", self.tcl.getvar("::JLC2CaptureDock::lastImport"), "olb_path"))), replacement)
 
     def test_tk_import_always_verifies_backend_assets_even_with_in_memory_cache(self):

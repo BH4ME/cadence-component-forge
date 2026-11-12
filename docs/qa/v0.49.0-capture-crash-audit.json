@@ -1,0 +1,320 @@
+{
+  "date": "2026-11-12",
+  "mode": "Read-only audit of existing logs, dumps, official installed scripts and product sources; no Capture launch, system settings changes, binary modification or source fix.",
+  "crashes": [
+    {
+      "id": "initial_instrumented_retest",
+      "dump_time_utc": "2026-11-12T00:18:02+00:00",
+      "dump_time_local": "2026-11-12T08:18:02+08:00",
+      "time_basis": "Minidump header timestamp; XML timestamp is not treated as UTC because it differs from the header/file time by the local offset.",
+      "exception_code": "0xc0000005",
+      "exception_name": "ACCESS_VIOLATION",
+      "fault_module": "orDb_Dll64.dll",
+      "fault_module_rva": "0x253ea6",
+      "access_operation": "read",
+      "access_address": "0x0",
+      "reported_function": "DboPlacedInst::DboPlacedInst",
+      "reported_function_offset": "646",
+      "interrupted_thread_stack": [
+        {
+          "module": "orDb_Dll64.dll",
+          "reported_function": "DboPlacedInst::DboPlacedInst",
+          "reported_function_offset": "646"
+        },
+        {
+          "module": "orDb_Dll64.dll",
+          "reported_function": "DboPage::NewPlacedInst",
+          "reported_function_offset": "247"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "537122"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "1058367"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "1056381"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "Capture_SafeInit",
+          "reported_function_offset": "40709"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "40479"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "COrSWPParams::operator=",
+          "reported_function_offset": "443189"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclNRRunCallbacks",
+          "reported_function_offset": "99"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclChannelEventScriptInvoker",
+          "reported_function_offset": "113"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_NotifyChannel",
+          "reported_function_offset": "362"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclGetAndDetachPids",
+          "reported_function_offset": "2139"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_ServiceEvent",
+          "reported_function_offset": "236"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_ServiceAll",
+          "reported_function_offset": "265"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "172876"
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "106916"
+        },
+        {
+          "module": "mfc140.dll",
+          "reported_function": null,
+          "reported_function_offset": null
+        },
+        {
+          "module": "mfc140.dll",
+          "reported_function": null,
+          "reported_function_offset": null
+        },
+        {
+          "module": "Capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "3324739"
+        },
+        {
+          "module": "KERNEL32.DLL",
+          "reported_function": "BaseThreadInitThunk",
+          "reported_function_offset": "20"
+        },
+        {
+          "module": "ntdll.dll",
+          "reported_function": "RtlUserThreadStart",
+          "reported_function_offset": "33"
+        }
+      ],
+      "errorlog_sha256": "857e00938f300f4e7d9e9d2c682678fd987fab2fd6c75f15d843690cedda04b8",
+      "minidump_sha256": "49bfb52fb36db4ecbbf0a2dca42c880554197341bd169e07da40069a9ecb50d4",
+      "minidump_bytes": 33983130
+    },
+    {
+      "id": "earlier_final_test",
+      "dump_time_utc": "2026-11-11T16:30:58+00:00",
+      "dump_time_local": "2026-11-12T00:30:58+08:00",
+      "time_basis": "Minidump header timestamp; XML timestamp is not treated as UTC because it differs from the header/file time by the local offset.",
+      "exception_code": "0xc0000005",
+      "exception_name": "ACCESS_VIOLATION",
+      "fault_module": "orDb_Dll64.dll",
+      "fault_module_rva": "0x253ea6",
+      "access_operation": "read",
+      "access_address": "0x0",
+      "reported_function": "DboPlacedInst::DboPlacedInst",
+      "reported_function_offset": "646",
+      "interrupted_thread_stack": [
+        {
+          "module": "orDb_Dll64.dll",
+          "reported_function": "DboPlacedInst::DboPlacedInst",
+          "reported_function_offset": "646"
+        },
+        {
+          "module": "orDb_Dll64.dll",
+          "reported_function": "DboPage::NewPlacedInst",
+          "reported_function_offset": "247"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "537122"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "1058367"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "1056381"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "Capture_SafeInit",
+          "reported_function_offset": "40709"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "Capture_Init",
+          "reported_function_offset": "40479"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "COrSWPParams::operator=",
+          "reported_function_offset": "443189"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclNRRunCallbacks",
+          "reported_function_offset": "99"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclChannelEventScriptInvoker",
+          "reported_function_offset": "113"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_NotifyChannel",
+          "reported_function_offset": "362"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "TclGetAndDetachPids",
+          "reported_function_offset": "2139"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_ServiceEvent",
+          "reported_function_offset": "236"
+        },
+        {
+          "module": "tcl86.dll",
+          "reported_function": "Tcl_ServiceAll",
+          "reported_function_offset": "265"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "172876"
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "106916"
+        },
+        {
+          "module": "mfc140.dll",
+          "reported_function": null,
+          "reported_function_offset": null
+        },
+        {
+          "module": "mfc140.dll",
+          "reported_function": null,
+          "reported_function_offset": null
+        },
+        {
+          "module": "capture.exe",
+          "reported_function": "COrCMTclInterface::operator=",
+          "reported_function_offset": "3324739"
+        },
+        {
+          "module": "KERNEL32.DLL",
+          "reported_function": "BaseThreadInitThunk",
+          "reported_function_offset": "20"
+        },
+        {
+          "module": "ntdll.dll",
+          "reported_function": "RtlUserThreadStart",
+          "reported_function_offset": "33"
+        }
+      ],
+      "errorlog_sha256": "4f951124a1eff603b30e4b10ecb1a9e93aacf106c8519b1031c384ea2c529cd5",
+      "minidump_sha256": "a171ad667564af2f4113d79b4f375848d6579520479d7782b446b6a782b03a71",
+      "minidump_bytes": 34015357
+    }
+  ],
+  "same_exception_and_fault_rva": true,
+  "windows_event_search": "Application log is readable and enabled; no Capture Application Error/Windows Error Reporting match for the two days preceding the audit. Latest system WER/CrashDumps Capture artifact is from 2026-11-09, so it is not used to diagnose these two tests.",
+  "source_identity": [
+    {
+      "file": "capture_plugin/jlc2capture_dock.tcl",
+      "repository_sha256": "093a31dcde354dc6b2fa706c0b6e94cdb411628e023f2fa07b94394f16f56d4e",
+      "installed_sha256": "093a31dcde354dc6b2fa706c0b6e94cdb411628e023f2fa07b94394f16f56d4e",
+      "equal": true
+    },
+    {
+      "file": "capture_plugin/jlc2capture.tcl",
+      "repository_sha256": "4fbf1f7873ead1d0199958546f1ea6bdd73a3355f04570a6a1a81f77551a8f48",
+      "installed_sha256": "4fbf1f7873ead1d0199958546f1ea6bdd73a3355f04570a6a1a81f77551a8f48",
+      "equal": true
+    }
+  ],
+  "official_usage_audit": [
+    {
+      "reference": "tools/capture/tclscripts/capAutoLoad/capPSpPartPick.tcl:69",
+      "usage": "PlaceNew $lOlbPath $Part 0"
+    },
+    {
+      "reference": "tools/capture/tclscripts/capPSpiceSourceApp/tcl/capSourceAppBase.tcl:220",
+      "usage": "PlaceNew $lOlbPath $type 0"
+    },
+    {
+      "reference": "tools/capture/tclscripts/capPSpiceModelApp/tcl/PSpiceModelAppCapture.tcl:247",
+      "usage": "Wrapper accepts olbPath, symbol, flag, then calls PlaceNew $olbPath $symbol $flag"
+    },
+    {
+      "reference": "tools/capture/tclscripts/capUnifiedSearch/tcl/OrHandlerUnifiedSearch.tcl:775",
+      "usage": "Official search UI uses PlacePartEx with normalized OLB path, package name, empty device designator, isConvert=0, and property lists"
+    },
+    {
+      "reference": "doc/orctclsample/TCL_Programmimg_with_OrCAD_Capture_GUI_Interface.html:467",
+      "usage": "Official interactive example uses PlacePartEx <OLB> <package> empty-designator 0; fixed-coordinate PlacePart uses a separate designator argument"
+    }
+  ],
+  "argument_conclusions": [
+    "Production PlaceNew <generated OLB path> C2053170_STM32F031F6P7TR 0 matches installed official examples; no observed argument-count mismatch.",
+    "The package exists and independent OLB enumeration finds exactly one package, device and logical part, with 20 pins.",
+    "Earlier GetDesignator values matched (-1); initial GetId scans did not inspect status. The follow-up returned GetId=0 with Failed=1, so IDs are unavailable rather than valid zero IDs. See v0.49.1-capture-placement.json.",
+    "The third PlaceNew argument is named flag in the official wrapper. The available official sources do not establish that it should be replaced by the native device designator or an assumed device index.",
+    "The official PlacePartEx example provides a separate designator slot; it must not be used to infer PlaceNew argument semantics by position."
+  ],
+  "evidence_boundaries": [
+    "Both dumps prove a native null read in the same module/RVA while constructing a placed instance. They do not identify the invalid native object's origin or whether product state, loaded libraries, callback timing, or a host defect triggered it.",
+    "TclChannelEventScriptInvoker and Tcl_NotifyChannel occur below Capture in both interrupted stacks, consistent with the product's fileevent -> finish -> PlaceNew path. This is context, not proof that fileevent or execution traces caused the crash.",
+    "Large symbol offsets in the report may reflect the nearest exported symbol; private debug symbols are unavailable. The dump-derived module/RVA and exception parameters are stronger location evidence than inferred private function names.",
+    "Initial instrumented trial compiled a new OLB immediately before PlaceNew; successful repeats used the cached file in a different Capture session. Trace presence, first-load/build state and process state were not isolated one variable at a time.",
+    "The saved session log reports the not-yet-existing target OLB, then creates and saves it; those lines alone are not evidence of a missing library at placement time.",
+    "The confirmed hostedClientId QA callback mismatch is separate: the crashes occur before PlaceNew returns; callback adjustment does not explain these crashes."
+  ],
+  "conclusion": "Fault module and exception are now established. Root cause remains unproven. Do not modify geometry, device metadata, license handling or PlaceNew arguments based only on these observations.",
+  "privacy": "Only selected exception/stack metadata and hashes are exported. Raw dumps and XML contain process memory and environment details and are retained locally.",
+  "followup": {
+    "report": "v0.49.1-capture-placement.json",
+    "status": "cold_controls_completed",
+    "finding": "Untraced raw-path cold builds crashed with alpha0 and alpha2. Official OLB path normalization allowed both to return from PlaceNew; alpha0 saved API readback passed and a later alpha2 repair-path human placement passed. Prior dump evidence is preserved; no claim of private Cadence internal mechanism.",
+    "installed_production_acceptance": {
+      "release_id": "0.49.1-94bc97f4592d",
+      "status": "passed_fresh_Capture_process_without_QA_override",
+      "report": "v0.49.1-capture-placement.json",
+      "historical_dump_results_preserved": true
+    }
+  }
+}

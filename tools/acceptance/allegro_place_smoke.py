@@ -7,8 +7,10 @@ products are tried. All writes are restricted to a newly created output folder.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
+import locale
 import math
 import os
 from pathlib import Path
@@ -16,6 +18,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 
 
 def quoted(value: str | Path) -> str:
@@ -84,6 +87,69 @@ def compare(source: dict, board: dict, expected_pins: int | None) -> dict:
     return {"pin_count": len(before), "max_pin_center_error_mm": maximum,
             "tolerance_mm": 0.00005, "all_pin_numbers_and_padstacks_equal": True,
             "step_mapping_equal": True, "translation_mm": [25, 25], "rotation_degrees": 0}
+
+
+def run_phase(command: list[str], *, phase: str, root: Path,
+              environment: dict[str, str], timeout: float) -> dict:
+    """Wait for the launched PID; inherited output handles cannot prolong it."""
+    stdout_path = root / (phase + ".stdout.log")
+    stderr_path = root / (phase + ".stderr.log")
+    process_path = root / (phase + ".process.json")
+    started = time.monotonic()
+    result = {"phase": phase, "command": command, "pid": None, "exit_code": None,
+              "status": "starting", "timed_out": False, "termination_requested": False,
+              "started_at_utc": datetime.now(timezone.utc).isoformat(), "timeout_seconds": timeout,
+              "stdout_file": str(stdout_path), "stderr_file": str(stderr_path)}
+
+    def record():
+        process_path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    record()
+    # Regular files have no EOF handshake. A descendant may inherit these
+    # handles without making an already-exited parent appear to time out.
+    with stdout_path.open("wb") as stdout, stderr_path.open("wb") as stderr:
+        try:
+            process = subprocess.Popen(command, cwd=root, env=environment, stdin=subprocess.DEVNULL,
+                                       stdout=stdout, stderr=stderr, close_fds=True,
+                                       creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except OSError as error:
+            result.update(status="launch_failed", error=str(error))
+        else:
+            result.update(pid=process.pid, status="running")
+            record()
+            try:
+                result["exit_code"] = process.wait(timeout=timeout)
+                result.update(status="exited", exit_code_origin="process_exit")
+            except subprocess.TimeoutExpired:
+                code_at_timeout = process.poll()
+                result.update(status="timed_out", timed_out=True,
+                              alive_at_timeout=code_at_timeout is None,
+                              exit_code_before_termination=code_at_timeout)
+                record()
+                if code_at_timeout is None:
+                    result["termination_requested"] = True
+                    record()
+                    try:
+                        process.kill()
+                        result["exit_code"] = process.wait(timeout=5)
+                    except (OSError, subprocess.TimeoutExpired) as error:
+                        result["termination_error"] = str(error)
+                        result["exit_code"] = process.poll()
+                    result["exit_code_origin"] = "forced_termination"
+                else:
+                    result["exit_code"] = code_at_timeout
+                    result["exit_code_origin"] = "process_exit"
+    result["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
+    result["elapsed_seconds"] = round(time.monotonic() - started, 6)
+    if result["exit_code"] is not None:
+        result["exit_code_hex"] = f"0x{result['exit_code'] & 0xffffffff:08X}"
+    # These snapshots are for convenience. The separate files retain any later
+    # descendant output; completion is still checked by the native artifacts.
+    encoding = locale.getpreferredencoding(False)
+    result["stdout"] = stdout_path.read_text(encoding=encoding, errors="replace")
+    result["stderr"] = stderr_path.read_text(encoding=encoding, errors="replace")
+    record()
+    return result
 
 
 def run(args: argparse.Namespace) -> dict:
@@ -171,21 +237,15 @@ def run(args: argparse.Namespace) -> dict:
             replay.write_text(f"skill load({quoted(il)})\nexit\n", encoding="utf-8")
             command = [str(exe), "-product", args.product, "-nograph", "-p", str(root),
                        str(root / designs[phase]), "-s", str(replay)]
-            try:
-                completed = subprocess.run(command, cwd=root, env=environment, capture_output=True,
-                                           text=True, errors="replace", timeout=args.timeout,
-                                           creationflags=subprocess.CREATE_NO_WINDOW)
-            except subprocess.TimeoutExpired as error:
-                decode = lambda value: value.decode(errors="replace") if isinstance(value, bytes) else value or ""
-                result["phases"].append({"phase": phase, "command": command, "exit_code": None,
-                                         "timed_out": True, "stdout": decode(error.stdout),
-                                         "stderr": decode(error.stderr)})
-                raise ValueError(f"Allegro {phase} timed out after {args.timeout} seconds; see acceptance.json") from error
-            result["phases"].append({"phase": phase, "command": command, "exit_code": completed.returncode,
-                                     "stdout": completed.stdout, "stderr": completed.stderr})
+            completed = run_phase(command, phase=phase, root=root, environment=environment, timeout=args.timeout)
+            result["phases"].append(completed)
             save_report()
-            if completed.returncode:
-                raise ValueError(f"Allegro {phase} exited with {completed.returncode}; see acceptance.json")
+            if completed["timed_out"]:
+                raise ValueError(f"Allegro {phase} launched PID {completed['pid']} timed out after {args.timeout} seconds; see acceptance.json")
+            if completed["status"] == "launch_failed":
+                raise ValueError(f"Allegro {phase} could not start: {completed['error']}")
+            if completed["exit_code"] != 0:
+                raise ValueError(f"Allegro {phase} exited with {completed['exit_code']}; see acceptance.json")
             if phase == "place" and not (root / "placed_board.brd").is_file():
                 raise ValueError("The native script did not save a PCB; inspect place.txt and journal")
         source = readback(root / "source.txt")

@@ -1,0 +1,312 @@
+{
+  "version": "0.49.0",
+  "test_date": "2026-11-12",
+  "native_product": "OrCAD PCB Designer Professional 17.4 S039",
+  "explicit_product_argument": "OrCAD_PCB_Designer",
+  "execution": {
+    "nograph": true,
+    "CREATE_NO_WINDOW": true,
+    "fresh_output_per_run": true,
+    "automatic_retries": false,
+    "stdout_stderr_regular_files": true,
+    "wait_scope": "exact launched PID",
+    "visible_window_poll_seconds": 0.05
+  },
+  "result": {
+    "scheduled_runs": 4,
+    "completed_runs": 4,
+    "passed_runs": 4,
+    "failed_runs": 0,
+    "native_phases": 12,
+    "native_phase_exit_zero": 12,
+    "timeouts": 0,
+    "forced_terminations": 0,
+    "visible_test_windows_observed": false,
+    "library_file_count": 1335,
+    "library_bytes_unchanged": true
+  },
+  "diagnostic_change": {
+    "previous_ambiguity": "Captured-output EOF can remain pending after the launched process exits when a descendant inherits its output handles.",
+    "synthetic_reproduction": {
+      "parent_exit_code_before_output_wait": 0,
+      "parent_poll_at_output_timeout": 0,
+      "output_wait_timed_out": true
+    },
+    "fixed_reproduction": {
+      "parent_exit_code": 0,
+      "timed_out": false,
+      "descendant_still_running_at_return": true
+    },
+    "historical_timeout_cause_established": false
+  },
+  "limitations": [
+    "Four predetermined successful runs verify this bounded sample, not the absence of intermittent native failures.",
+    "The earlier C9160 0xC0000005 and historical timeout remain recorded separately; neither was erased or reclassified as success.",
+    "The synthetic pipe reproduction proves the old supervision ambiguity but does not establish the cause of the historical Allegro timeout.",
+    "No visible window owned by a currently recorded native PID was observed by 50 ms polling; this is not a recording of the entire desktop.",
+    "Pin centers, numbers, padstack names, and STEP mapping metadata were compared; full 3D fit and complete graphic geometry are outside this check.",
+    "Only this 17.4 S039 installation was tested; 17.2 was unavailable."
+  ],
+  "runs": [
+    {
+      "case": "C9160_1",
+      "lcsc_id": "C9160",
+      "ok": true,
+      "footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "phases": [
+        {
+          "phase": "source",
+          "pid": 9472,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:19.633782+00:00",
+          "finished_at_utc": "2026-11-12T02:35:23.362418+00:00",
+          "elapsed_seconds": 3.734
+        },
+        {
+          "phase": "place",
+          "pid": 28692,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:23.364418+00:00",
+          "finished_at_utc": "2026-11-12T02:35:29.588736+00:00",
+          "elapsed_seconds": 6.235
+        },
+        {
+          "phase": "reopen",
+          "pid": 5076,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:29.589743+00:00",
+          "finished_at_utc": "2026-11-12T02:35:35.730159+00:00",
+          "elapsed_seconds": 6.14
+        }
+      ],
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "source_sha256": {
+        "dra": "848838ffd62ba57805a9c0f16ac73ba1f2909ec355209b4dd9e43193c08408f1",
+        "psm": "d29fa8f2abcd303ca78e948cbaba35efbbd7f8ed408713fa917d86c2aaf68a6d"
+      },
+      "source_dra_psm_unchanged": true,
+      "visible_test_window_observed": false
+    },
+    {
+      "case": "C9160_2",
+      "lcsc_id": "C9160",
+      "ok": true,
+      "footprint": "c9160_fpc_smd_40p_p0_5_e2905a6b",
+      "phases": [
+        {
+          "phase": "source",
+          "pid": 36164,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:35.742486+00:00",
+          "finished_at_utc": "2026-11-12T02:35:41.688381+00:00",
+          "elapsed_seconds": 5.954
+        },
+        {
+          "phase": "place",
+          "pid": 35596,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:41.689937+00:00",
+          "finished_at_utc": "2026-11-12T02:35:48.192480+00:00",
+          "elapsed_seconds": 6.5
+        },
+        {
+          "phase": "reopen",
+          "pid": 31636,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:48.194564+00:00",
+          "finished_at_utc": "2026-11-12T02:35:54.565227+00:00",
+          "elapsed_seconds": 6.375
+        }
+      ],
+      "comparison": {
+        "pin_count": 42,
+        "max_pin_center_error_mm": 3.552713678800501e-15,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "source_sha256": {
+        "dra": "848838ffd62ba57805a9c0f16ac73ba1f2909ec355209b4dd9e43193c08408f1",
+        "psm": "d29fa8f2abcd303ca78e948cbaba35efbbd7f8ed408713fa917d86c2aaf68a6d"
+      },
+      "source_dra_psm_unchanged": true,
+      "visible_test_window_observed": false
+    },
+    {
+      "case": "C11255_1",
+      "lcsc_id": "C11255",
+      "ok": true,
+      "footprint": "c11255_res_th_bd3_0_l9_49041e03",
+      "phases": [
+        {
+          "phase": "source",
+          "pid": 2092,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:35:54.574196+00:00",
+          "finished_at_utc": "2026-11-12T02:36:00.815199+00:00",
+          "elapsed_seconds": 6.235
+        },
+        {
+          "phase": "place",
+          "pid": 3716,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:36:00.817197+00:00",
+          "finished_at_utc": "2026-11-12T02:36:07.108072+00:00",
+          "elapsed_seconds": 6.296
+        },
+        {
+          "phase": "reopen",
+          "pid": 28148,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:36:07.110412+00:00",
+          "finished_at_utc": "2026-11-12T02:36:13.422728+00:00",
+          "elapsed_seconds": 6.313
+        }
+      ],
+      "comparison": {
+        "pin_count": 2,
+        "max_pin_center_error_mm": 0.0,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "source_sha256": {
+        "dra": "2a968a06cdf6c98294ec2c811506983a96867ce63fe86872ae7cc25c602addfe",
+        "psm": "b3b27a7517dc463c2cd973c7e3b212cddd80e58dac50378ce01143ee7e5ba49e"
+      },
+      "source_dra_psm_unchanged": true,
+      "visible_test_window_observed": false
+    },
+    {
+      "case": "C11255_2",
+      "lcsc_id": "C11255",
+      "ok": true,
+      "footprint": "c11255_res_th_bd3_0_l9_49041e03",
+      "phases": [
+        {
+          "phase": "source",
+          "pid": 29712,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:36:13.431133+00:00",
+          "finished_at_utc": "2026-11-12T02:36:19.689328+00:00",
+          "elapsed_seconds": 6.25
+        },
+        {
+          "phase": "place",
+          "pid": 33756,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:36:19.690913+00:00",
+          "finished_at_utc": "2026-11-12T02:36:26.958770+00:00",
+          "elapsed_seconds": 7.265
+        },
+        {
+          "phase": "reopen",
+          "pid": 40124,
+          "status": "exited",
+          "exit_code": 0,
+          "exit_code_hex": "0x00000000",
+          "exit_code_origin": "process_exit",
+          "timed_out": false,
+          "termination_requested": false,
+          "started_at_utc": "2026-11-12T02:36:26.960330+00:00",
+          "finished_at_utc": "2026-11-12T02:36:34.226180+00:00",
+          "elapsed_seconds": 7.266
+        }
+      ],
+      "comparison": {
+        "pin_count": 2,
+        "max_pin_center_error_mm": 0.0,
+        "tolerance_mm": 5e-05,
+        "all_pin_numbers_and_padstacks_equal": true,
+        "step_mapping_equal": true,
+        "translation_mm": [
+          25,
+          25
+        ],
+        "rotation_degrees": 0
+      },
+      "source_sha256": {
+        "dra": "2a968a06cdf6c98294ec2c811506983a96867ce63fe86872ae7cc25c602addfe",
+        "psm": "b3b27a7517dc463c2cd973c7e3b212cddd80e58dac50378ce01143ee7e5ba49e"
+      },
+      "source_dra_psm_unchanged": true,
+      "visible_test_window_observed": false
+    }
+  ]
+}

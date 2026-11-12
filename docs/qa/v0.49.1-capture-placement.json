@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "target_version": "0.49.1",
+  "date": "2026-11-12",
+  "timezone": "Asia/Shanghai",
+  "report_status": "controlled_QA_and_installed_production_acceptance_complete_prerelease",
+  "environment": {
+    "os": "Windows x64",
+    "capture": "17.4 S039",
+    "host_count": 1,
+    "installed_payload_during_controlled_trials": "0.49.0-3a2c3f5def8e",
+    "capture_17_2_installed": false,
+    "clean_customer_machine_tested": false,
+    "normalized_success_cases_share_capture_session": true
+  },
+  "component": {
+    "lcsc_id": "C2053170",
+    "mpn": "STM32F031F6P7TR",
+    "pin_count": 20
+  },
+  "controlled_change": {
+    "normalization_api": "DboLib_sGetNormalizedName(inputCString, outputCString, 0)",
+    "placement_api_retained": "PlaceNew",
+    "symbol_name_retained": true,
+    "third_argument_retained": 0,
+    "lastImport_mutated_for_normalization": false,
+    "installed_production_source_modified_for_trials": false,
+    "qa_override_restored_from_verified_installed_source": true,
+    "planned_product_fix": "Only normalize native OLB placement paths; keep original alphabeticNumbering and all source geometry."
+  },
+  "cold_definition": "No native OLB/integrity file, no design instances and no cached packages. Supplier data, XML, IR, footprints and STEP were already cached. Not a first-network-download benchmark or four independent OS starts.",
+  "cases": [
+    {
+      "id": "cold_olb",
+      "alphabeticNumbering": 0,
+      "path_argument": "original_mixed_case_path",
+      "native_olb_cold": true,
+      "initial_native_olb_count": 0,
+      "initial_integrity_count": 0,
+      "initial_instance_count": 0,
+      "initial_cached_package_count": 0,
+      "supplier_and_converted_asset_cache": "prepopulated",
+      "execution_trace_enabled": false,
+      "external_olb_build_used": false,
+      "native_build_occurred": true,
+      "place_new_returned": false,
+      "host_outcome": "native_crash_observed_by_operator",
+      "cold_build_olb_filename": "LIBRARY.OLB",
+      "source_xml_bytes": 206568,
+      "source_xml_sha256": "635a7cfa2109865c9a35c6763779f6c8e832d35e24d0e9ce9880124a609a8e79",
+      "asset_count": 22,
+      "all_original_assets_still_match_preparation_hashes": true,
+      "all_prepared_assets_match_expected_hashes": true,
+      "native_olb_files": [
+        {
+          "filename": "LIBRARY.OLB",
+          "bytes": 51712,
+          "crc32": "3872ce8f",
+          "sha256": "d099ec5bf28923da402e700c9ae960257982ad897f4baac863ec46b4fc071da4"
+        }
+      ],
+      "readback_lines": [],
+      "evidence_sha256": {
+        "native.log": "b1b2150c63af00bc60c617587c87097df5d07d2936e68bc9ea2c61d3bfcb1619",
+        "panel.json": "3a47e5be020990eb43aab8476ae38502f2dc1229771228d5915820dd4c081872",
+        "fixture.json": "3d75d75f757ef9889eeadee7f3badfb46bd9a3661f3c1690196f9fe1dbea15a7",
+        "native_flow.tcl": "30f00bea098091b7d745d81ff0a361b6467671c2588ccb1660ee1848e47ae589",
+        "native_flow.js": "aa638e99b5d759aa06ba595730f5468608bc94cb6ef2b8ce5ba437c2956ac704"
+      },
+      "place_entered_local": "2026-11-12T10:45:38+08:00",
+      "commit_method": "none",
+      "readback_passed": false
+    },
+    {
+      "id": "cold_numbering2",
+      "alphabeticNumbering": 2,
+      "path_argument": "original_mixed_case_path",
+      "native_olb_cold": true,
+      "initial_native_olb_count": 0,
+      "initial_integrity_count": 0,
+      "initial_instance_count": 0,
+      "initial_cached_package_count": 0,
+      "supplier_and_converted_asset_cache": "prepopulated",
+      "execution_trace_enabled": false,
+      "external_olb_build_used": false,
+      "native_build_occurred": true,
+      "place_new_returned": false,
+      "host_outcome": "native_crash_observed_by_operator",
+      "cold_build_olb_filename": "LIBRARY.OLB",
+      "source_xml_bytes": 206568,
+      "source_xml_sha256": "9ce16b69c050b6509e9740c1e438d334edea03d67605bb6fdff2d0458ef5e766",
+      "asset_count": 22,
+      "all_original_assets_still_match_preparation_hashes": true,
+      "all_prepared_assets_match_expected_hashes": true,
+      "native_olb_files": [
+        {
+          "filename": "LIBRARY.OLB",
+          "bytes": 51712,
+          "crc32": "ed5c85b4",
+          "sha256": "2841676aecac5befd3d36035f90845a8b4531b9efcb733dc8b2938257580b19a"
+        }
+      ],
+      "readback_lines": [],
+      "evidence_sha256": {
+        "native.log": "5b81c5be7eaac6e57ef3a6c02a4a41d9d55d2b7d6ba785b359e59086b69cd17b",
+        "panel.json": "e2efcc6126eaf55727efc83916e626b9d8f0384433e2e542bd544925764a85ce",
+        "fixture.json": "3ecf76be1261d334647015be336c2e0a36689987cd439f8f2526807598e98e4f",
+        "native_flow.tcl": "72fd2a67fa6caafb6ea781828b09fbd20f6adf28961fa35a9f077d2c5506cfc3",
+        "native_flow.js": "9098684b39a3b304d385bb0207a6835b8f2d8f7f3cbbb1190cb87cf48b4244ba"
+      },
+      "place_entered_local": "2026-11-12T10:56:16+08:00",
+      "commit_method": "none",
+      "readback_passed": false
+    },
+    {
+      "id": "cold_normalized",
+      "alphabeticNumbering": 2,
+      "path_argument": "official_DboLib_sGetNormalizedName",
+      "native_olb_cold": true,
+      "initial_native_olb_count": 0,
+      "initial_integrity_count": 0,
+      "initial_instance_count": 0,
+      "initial_cached_package_count": 0,
+      "supplier_and_converted_asset_cache": "prepopulated",
+      "execution_trace_enabled": false,
+      "external_olb_build_used": false,
+      "native_build_occurred": true,
+      "place_new_returned": true,
+      "host_outcome": "responsive_after_PlaceNew",
+      "cold_build_olb_filename": "LIBRARY.OLB",
+      "source_xml_bytes": 206568,
+      "source_xml_sha256": "9ce16b69c050b6509e9740c1e438d334edea03d67605bb6fdff2d0458ef5e766",
+      "asset_count": 22,
+      "all_original_assets_still_match_preparation_hashes": true,
+      "all_prepared_assets_match_expected_hashes": true,
+      "native_olb_files": [
+        {
+          "filename": "LIBRARY.OLB",
+          "bytes": 51712,
+          "crc32": "3517357e",
+          "sha256": "508ffc49af4c4b4c70412e106ea94fda1a6fdc0e5bcdc32546c4e409468ff01c"
+        },
+        {
+          "filename": "LIBRARY.VERIFIED.85122F05.3552484186.OLB",
+          "bytes": 51712,
+          "crc32": "24a9ed47",
+          "sha256": "1a6ec5fcd15b115e3efd44b4f2dc9b368fa9fe9671e9b6ad94fb24d71c3c85a6"
+        }
+      ],
+      "readback_lines": [
+        "PART_VERIFIED reference=U1 value=STM32F031F6P7TR pins=20",
+        "COLD_DESIGN_VERIFIED instances=1 cached_packages=0"
+      ],
+      "evidence_sha256": {
+        "native.log": "7047b1fdf63d67103d03a0c6015ab65992993872b4478821c9a91a51c043a92b",
+        "panel.json": "12913f217064c9c653f5aba448b658fa424f9b7b8ca9b5e8d9f01b9126c35d91",
+        "fixture.json": "34885809049cc7033917029a99dfca8e9fbdff282359698a6839925949181719",
+        "native_flow.tcl": "3458827746df4d5dec63cff64e5ec35a6783c1c1b68639af76c0befd61d415be",
+        "native_flow.js": "c54da1443372cc7580966cc2250551950eeddd0cce399b98e8f02a618d9be815",
+        "readback.log": "8730544bb36951a18670298d1948f65c9848745d652f7bcc09896b5a74aecf4a",
+        "normalization_override.tcl": "ca41b3d4e714797577bff2a8563a74a90511905144ae1f6dc2b4cfc6696dbce7"
+      },
+      "cold_tracker_returned_local": "2026-11-12T11:17:54+08:00",
+      "cached_place_to_response_ms": 1812,
+      "initial_cold_call_mouse_commit_verified": false,
+      "later_commit": {
+        "local_time": "2026-11-12T11:22:56+08:00",
+        "different_PlaceNew_call": true,
+        "olb_filename": "LIBRARY.verified.85122f05.3552484186.olb",
+        "uses_repair_olb_path": true,
+        "method": "human_mouse_observed",
+        "instance_count_before": 0,
+        "instance_count_after": 1,
+        "reference": "U1",
+        "pin_count": 20,
+        "saved_and_independent_readback_passed": true
+      },
+      "readback_passed": true
+    },
+    {
+      "id": "cold_normalized_alpha0",
+      "alphabeticNumbering": 0,
+      "path_argument": "official_DboLib_sGetNormalizedName",
+      "native_olb_cold": true,
+      "initial_native_olb_count": 0,
+      "initial_integrity_count": 0,
+      "initial_instance_count": 0,
+      "initial_cached_package_count": 0,
+      "supplier_and_converted_asset_cache": "prepopulated",
+      "execution_trace_enabled": false,
+      "external_olb_build_used": false,
+      "native_build_occurred": true,
+      "place_new_returned": true,
+      "host_outcome": "responsive_after_PlaceNew",
+      "cold_build_olb_filename": "LIBRARY.OLB",
+      "source_xml_bytes": 206568,
+      "source_xml_sha256": "635a7cfa2109865c9a35c6763779f6c8e832d35e24d0e9ce9880124a609a8e79",
+      "asset_count": 22,
+      "all_original_assets_still_match_preparation_hashes": true,
+      "all_prepared_assets_match_expected_hashes": true,
+      "native_olb_files": [
+        {
+          "filename": "LIBRARY.OLB",
+          "bytes": 51712,
+          "crc32": "806b68ed",
+          "sha256": "af61d4ad1a4d906fb315014587428d2532cccaf5160e8084a6f10fefbcae63f8"
+        }
+      ],
+      "readback_lines": [
+        "LIVE_OLB_VERIFIED C2053170_STM32F031F6P7TR",
+        "LIVE_INSTANCE_VERIFIED reference=U1 pins=20 footprint=c2053170_tssop_20_l6_5_f2bd621e",
+        "LIVE_DSN_VERIFIED count=1 references=U1"
+      ],
+      "evidence_sha256": {
+        "native.log": "c58235b46dcaa3c65c8853a23f6e78a8e6fac1444caf193831f66004c58d59a8",
+        "panel.json": "30fa6b7bb28b9bc73ed460101c484f05e52f6b493e4e443ff8f813136e69f138",
+        "fixture.json": "033cd8c76981f971887a0291c9f5def5e6633a0100d2be28f66a25287994e705",
+        "native_flow.tcl": "c18e58d94b58681c19a08dcb1d633992288aaa7101ea574006e17866e6d2b3c4",
+        "native_flow.js": "9fc174ad5a671e1f81592860317b846397e73a0ca450a8092d56a2b289d25f82",
+        "readback.log": "dc2454334e32a71db8732a8e28394c771cf3b2444ce93773ac7d59aadcc14da9",
+        "commit_normalized.tcl": "63874487944b51c6810cfa0598fe1482704985d7423e58788436e89a03558ec9",
+        "normalization_override.tcl": "6a1c8781f549b8da9f071823f7c7b65b2db628a292282fd4c4e7af420f782e60"
+      },
+      "cold_tracker_returned_local": "2026-11-12T11:25:18+08:00",
+      "cached_place_to_response_ms": 1788,
+      "commit_method": "official_PlacePart_with_normalized_path_and_explicit_QA_SetReference_U1",
+      "commit_local": "2026-11-12T11:26:37+08:00",
+      "mouse_commit_verified": false,
+      "automatic_reference_assignment_verified": false,
+      "saved_instance_count": 1,
+      "saved_reference": "U1",
+      "saved_pin_count": 20,
+      "saved_pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e",
+      "readback_passed": true
+    }
+  ],
+  "native_geometry_comparison": {
+    "baseline_native_device": "device 1 designator -1 id {value 0 status_failed 1}",
+    "numbering2_native_device": "device 1 designator {} id {value 0 status_failed 1}",
+    "native_pin_count": 20,
+    "all_native_pin_records_identical": true,
+    "native_part_and_bbox_identical": true,
+    "source_NormalView_structures_identical": true,
+    "source_PhysicalPart_structure_identical": true,
+    "source_xml_sha256": {
+      "baseline": "635a7cfa2109865c9a35c6763779f6c8e832d35e24d0e9ce9880124a609a8e79",
+      "numbering2": "9ce16b69c050b6509e9740c1e438d334edea03d67605bb6fdff2d0458ef5e766"
+    },
+    "actual_olb_sha256": {
+      "baseline": "d099ec5bf28923da402e700c9ae960257982ad897f4baac863ec46b4fc071da4",
+      "numbering2": "2841676aecac5befd3d36035f90845a8b4531b9efcb733dc8b2938257580b19a"
+    },
+    "olb_bytes_unchanged_during_inspection": true,
+    "scope": "Native Dbo read only: device designator, pin identities, coordinates, directions, electrical types and part bbox; full NormalView graphics equivalence additionally from existing source XML. Native GetId returned 0 with Failed=1, so ID is unavailable, not valid zero."
+  },
+  "additional_evidence_sha256": {
+    "native_geometry_comparison.json": "26dd42790e6a520b814f85dec55c0adbd46e3e3a30f7c017838d740075692009",
+    "import_compare.json": "5182e8e4d0f996f052682f5958f64a43e2ea198b22409ddba5601be6bbf4af0a"
+  },
+  "conclusion": "On this Capture 17.4 host, the raw path crashed with either numbering value, while official path normalization allowed the first native OLB build to enter PlaceNew successfully with both values. Original-alpha0 saved API placement and separate alpha2 repair-path human placement passed independent readback. Numbering changes are unnecessary for the demonstrated path fix; Cadence internal object-management details remain unproven. The final installed 0.49.1 production plugin then passed cold OLB creation, real CEF PlaceNew return, API save and independent readback in a fresh Capture process without overrides. Its reference remains U? because this test did not explicitly annotate; no new mouse or automatic-numbering acceptance is claimed.",
+  "timing_limit": "Two local cached place-to-return observations only; includes native build and host callback time. No network, all-category or general speed claim.",
+  "final_deployment": {
+    "status": "passed",
+    "payload_id": "0.49.1-94bc97f4592d",
+    "previous_payload_id": "0.49.0-3a2c3f5def8e",
+    "installer_sha256": "0155ab86df271c69a59f25bdee0ebbd09cce85534558cc1263cea54f01a566e7",
+    "setup_exit_code": 0,
+    "installed_version_verified": true,
+    "installation_checks": {
+      "manifest_files_checked": 744,
+      "manifest_mismatches": [],
+      "source_files_checked": 65,
+      "source_files_equal": true,
+      "config_changed_keys": [
+        "python"
+      ],
+      "library_root_preserved": true,
+      "original_projects_files_checked": 4,
+      "original_projects_unchanged": true
+    },
+    "post_restart_production_plugin_acceptance": {
+      "status": "passed",
+      "fresh_capture_process": true,
+      "release_id": "0.49.1-94bc97f4592d",
+      "qa_production_proc_override_used": false,
+      "execution_trace_used": false,
+      "production_source_unchanged_during_test": true,
+      "native_olb_cold": true,
+      "initial_native_olb_count": 0,
+      "initial_integrity_count": 0,
+      "initial_design_instance_count": 0,
+      "initial_design_cached_package_count": 0,
+      "resources_generated_by_installed_bridge": true,
+      "source_xml_alphabeticNumbering": 0,
+      "source_xml_sha256": [
+        "635a7cfa2109865c9a35c6763779f6c8e832d35e24d0e9ce9880124a609a8e79"
+      ],
+      "real_cef_place_returned": true,
+      "cold_tracker_returned_local": "2026-11-12T12:16:16.584+08:00",
+      "cached_place_to_return_ms": 1748,
+      "native_olb": {
+        "filename": "LIBRARY.OLB",
+        "bytes": 51712,
+        "sha256": "5511dc6370a2d866bdc413261c846b2f6c6dc767f53bebdbf4c47a52fb284838",
+        "crc32": "ec7ef102"
+      },
+      "commit_method": "official_PlacePart_API",
+      "explicit_reference_annotation_used": false,
+      "mouse_commit_used": false,
+      "new_mouse_acceptance_claimed": false,
+      "automatic_reference_assignment_verified": false,
+      "saved_instance_count": 1,
+      "saved_reference": "U?",
+      "saved_value": "STM32F031F6P7TR",
+      "saved_pin_count": 20,
+      "saved_pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e",
+      "saved_footprint_matches_prepared_import": true,
+      "independent_saved_design_readback_passed": true,
+      "readback_lines": [
+        "PART_VERIFIED reference=U? value=STM32F031F6P7TR pins=20 footprint=c2053170_tssop_20_l6_5_f2bd621e",
+        "FOOTPRINT_VERIFIED expected=c2053170_tssop_20_l6_5_f2bd621e actual=c2053170_tssop_20_l6_5_f2bd621e source=prepared_import.json",
+        "COLD_DESIGN_VERIFIED instances=1 cached_packages=0"
+      ],
+      "generated_asset_counts": {
+        "checked": 12,
+        "unchanged": 12,
+        "changed_or_missing": 0
+      },
+      "generated_asset_classes": [
+        "XML",
+        "IR",
+        "PSM",
+        "PAD",
+        "DRA",
+        "STEP"
+      ],
+      "generated_assets_unchanged": true,
+      "source_and_setup_files_unchanged": true,
+      "original_file_count_checked": 8,
+      "footprint_ini_cleanup_passed": true,
+      "shared_config_and_real_library_restored": true,
+      "production_panel_reopened_after_restore": true,
+      "screenshot_visual_acceptance": false,
+      "screenshot_limitation": "Screenshot channel timed out; no new mouse or screenshot acceptance claimed.",
+      "artifact_checks": {
+        "installed_release_0491": true,
+        "initial_olb_count_zero": true,
+        "native_olb_built": true,
+        "production_source_unchanged": true,
+        "generated_source_xml_unchanged": true,
+        "generated_assets_unchanged": true,
+        "real_cef_place_returned": true,
+        "cef_uses_fixture_library": true,
+        "production_override_absent": true,
+        "official_api_commit_logged": true,
+        "mouse_acceptance_not_claimed": true,
+        "restoration_completed": true,
+        "footprint_ini_cleanup": true,
+        "saved_design_readback": true,
+        "saved_footprint_matches_prepared_import": true,
+        "no_native_test_error": true
+      }
+    },
+    "evidence_sha256": {
+      "installation_0491.json": "acee82879ca78634954696417bcc245f6d2e743732a4dfe8bbacb3c8801b68cb",
+      "fixture.json": "c747d4a9715b1bda0f636ae4b25dce5204301ff26497182811ae682733608886",
+      "panel.json": "7dd00e2a2dbb95d958f2fc104b7fdd326315d5290033e4ac506ff0521353940e",
+      "native.log": "ebb481db6df402ee661d10005359394294c95e9f6fc84296e95c537a5ca5e3d3",
+      "readback.log": "85bc22b097a8cc1beaf036c3f64d41c638b5f34bb231124862f1547a17c2cf03",
+      "artifacts.json": "898e1308247b109014b0da7f3d4e44f91bbf784add87852934690021b5ff7c25",
+      "normal_panel.log": "dd646fe17a0948efff7dfd10b8355a26e7b0d7174ce3f6806905952f27d7a11e",
+      "native_flow.tcl": "cd0f00f21a4fca25f9656d3c408b7d53ae81bc159e2e54d84d45dddd91251d4f",
+      "native_flow.js": "4af82ff7daa42f0b0269d77764119d4c61bee637f210d4764c3c10cb051c72ef",
+      "library.olb.integrity": "014b71a417402eccb10092b5b8f59e95298e0d3e1e0b72b2b2f8711595f20f1e"
+    },
+    "scope_limit": "One existing Windows host with Capture 17.4 S039. Production package acceptance passed after a fresh Capture launch; no new mouse commit or automatic annotation acceptance, no 17.2 or clean-customer qualification."
+  },
+  "remaining_limits": [
+    "One host / Capture 17.4 S039 / one representative component for this controlled matrix.",
+    "Capture 17.2, clean customer machines and other patch levels have not been tested here.",
+    "Historical PCB placement stability remains 8 successes and 2 failures in 10 trials; this Capture fix does not close those failures.",
+    "No screenshot visual qualification. Human mouse commit and explicit API/QA annotation are separately recorded.",
+    "Initial instrumented crash and the two later untraced crashes remain historical failures."
+  ],
+  "historical_reports": [
+    "v0.49.0-capture-retest.md",
+    "v0.49.0-capture-crash-audit.md",
+    "v0.49.0-pcb-placement.json"
+  ],
+  "privacy": "Only sanitized metadata and hashes are public. No local usernames, absolute paths, process identifiers, raw dumps or supplier CAD files are included.",
+  "automated_validation": {
+    "stage": "final_source_review_before_installer_build",
+    "reported_by": "release_owner",
+    "python": {
+      "total": 314,
+      "passed": 311,
+      "skipped": 3,
+      "failed": 0
+    },
+    "panel": {
+      "passed": 36,
+      "failed": 0
+    },
+    "updates": {
+      "total": 14,
+      "passed": 13,
+      "skipped": 1,
+      "failed": 0
+    },
+    "skips_counted_as_pass": false,
+    "post_install_native_acceptance_replaced": false
+  },
+  "release_channel": "prerelease"
+}

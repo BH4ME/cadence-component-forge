@@ -116,7 +116,7 @@ class AllegroPlacementAcceptanceTests(unittest.TestCase):
                 file.write_bytes(b"fixture")
             args = argparse.Namespace(cadence_root=cadence, library_root=library,
                                       product="OrCAD_PCB_Designer", footprint="test", output=root)
-            with patch.object(smoke.os, "name", "nt"), patch.object(smoke.subprocess, "run") as launch:
+            with patch.object(smoke.os, "name", "nt"), patch.object(smoke, "run_phase") as launch:
                 with self.assertRaisesRegex(ValueError, "new folder"):
                     smoke.run(args)
                 launch.assert_not_called()
@@ -125,10 +125,10 @@ class AllegroPlacementAcceptanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             args = self.native_arguments(root)
-            failed = smoke.subprocess.CompletedProcess([], 2, "No licenses available", "")
-            with patch.object(smoke.os, "name", "nt"), \
-                    patch.object(smoke.subprocess, "CREATE_NO_WINDOW", 0, create=True), \
-                    patch.object(smoke.subprocess, "run", return_value=failed) as launch:
+            def failed(command, **kwargs):
+                return {"phase": kwargs["phase"], "command": command, "pid": 1234, "exit_code": 2,
+                        "status": "exited", "timed_out": False, "stdout": "No licenses available", "stderr": ""}
+            with patch.object(smoke.os, "name", "nt"), patch.object(smoke, "run_phase", side_effect=failed) as launch:
                 result = smoke.run(args)
             self.assertFalse(result["ok"])
             self.assertEqual(launch.call_count, 1)
@@ -138,10 +138,10 @@ class AllegroPlacementAcceptanceTests(unittest.TestCase):
     def test_zero_exit_without_saved_pcb_is_not_success(self):
         with tempfile.TemporaryDirectory() as temporary:
             args = self.native_arguments(Path(temporary))
-            succeeded = smoke.subprocess.CompletedProcess([], 0, "", "")
+            succeeded = {"pid": 1234, "exit_code": 0, "status": "exited", "timed_out": False,
+                         "stdout": "", "stderr": ""}
             with patch.object(smoke.os, "name", "nt"), \
-                    patch.object(smoke.subprocess, "CREATE_NO_WINDOW", 0, create=True), \
-                    patch.object(smoke.subprocess, "run", return_value=succeeded):
+                    patch.object(smoke, "run_phase", return_value=succeeded):
                 result = smoke.run(args)
             self.assertFalse(result["ok"])
             self.assertIn("did not save a PCB", result["error"])
@@ -149,14 +149,13 @@ class AllegroPlacementAcceptanceTests(unittest.TestCase):
     def test_timeout_preserves_phase_and_native_output(self):
         with tempfile.TemporaryDirectory() as temporary:
             args = self.native_arguments(Path(temporary))
-            timeout = smoke.subprocess.TimeoutExpired("allegro", 1, output=b"native stdout",
-                                                       stderr=b"native stderr")
+            timeout = {"pid": 1234, "exit_code": 1, "status": "timed_out", "timed_out": True,
+                       "stdout": "native stdout", "stderr": "native stderr"}
             with patch.object(smoke.os, "name", "nt"), \
-                    patch.object(smoke.subprocess, "CREATE_NO_WINDOW", 0, create=True), \
-                    patch.object(smoke.subprocess, "run", side_effect=timeout):
+                    patch.object(smoke, "run_phase", return_value=timeout):
                 result = smoke.run(args)
             self.assertFalse(result["ok"])
-            self.assertIn("source timed out", result["error"])
+            self.assertIn("source launched PID 1234 timed out", result["error"])
             self.assertTrue(result["phases"][0]["timed_out"])
             self.assertEqual(result["phases"][0]["stdout"], "native stdout")
             self.assertEqual(result["phases"][0]["stderr"], "native stderr")

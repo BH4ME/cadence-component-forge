@@ -427,9 +427,10 @@ proc ::JLC2CaptureDock::finish {data} {
     if {$failed} { return -options $options $message }
     if {$operation eq "place"} {
         if {![llength [info commands PlaceNew]]} { ::error "PlaceNew requires OrCAD Capture" }
+        set placementOlb [::JLC2Capture::placementOlbPath [dict get $data olb_path]]
         activateTarget $operationTarget
         catch {UnSelectAll}
-        PlaceNew [dict get $data olb_path] [dict get $data symbol_name] 0
+        PlaceNew $placementOlb [dict get $data symbol_name] 0
     }
     emit $operation $json $operationId
 }

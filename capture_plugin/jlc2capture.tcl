@@ -1062,6 +1062,37 @@ proc ::JLC2Capture::buildOlb {data} {
     return $olb
 }
 
+proc ::JLC2Capture::placementOlbPath {olb} {
+    # PlaceNew must use the same library key as Capture's native registry,
+    # especially immediately after XMATIC creates an OLB in this process.
+    # Tcl file normalize does not implement DboLib's normalization rules.
+    foreach command {DboTclHelper_sMakeCString DboLib_sGetNormalizedName
+                     DboTclHelper_sGetConstCharPtr DboTclHelper_sDeleteCString} {
+        if {![llength [info commands $command]]} {
+            error "Capture OLB path normalization requires $command"
+        }
+    }
+    set input ""
+    set output ""
+    set state ""
+    set failed [catch {
+        set input [DboTclHelper_sMakeCString $olb]
+        set output [DboTclHelper_sMakeCString]
+        set state [DboLib_sGetNormalizedName $input $output 0]
+        # The return value is a DboState object, not a numeric error code.
+        if {$state eq "" || $state eq "NULL" || [$state OK] != 1} {
+            error "Capture OLB path normalization failed: $olb"
+        }
+        set normalized [DboTclHelper_sGetConstCharPtr $output]
+        if {$normalized eq ""} { error "Capture OLB path normalization returned an empty path: $olb" }
+    } message options]
+    if {$state ne "" && $state ne "NULL"} { catch {$state -delete} }
+    if {$output ne ""} { catch {DboTclHelper_sDeleteCString $output} }
+    if {$input ne ""} { catch {DboTclHelper_sDeleteCString $input} }
+    if {$failed} { return -options $options $message }
+    return $normalized
+}
+
 proc ::JLC2Capture::finishImport {data} {
     variable imported
     variable operationPart
@@ -1100,9 +1131,10 @@ proc ::JLC2Capture::finishImport {data} {
     setBusy 0
     if {$placeRequested} {
         if {![llength [info commands PlaceNew]]} { error "PlaceNew is only available inside OrCAD Capture" }
+        set placementOlb [placementOlbPath $olb]
         wm withdraw $window
         catch {UnSelectAll}
-        PlaceNew $olb $symbol 0
+        PlaceNew $placementOlb $symbol 0
     }
 }
 

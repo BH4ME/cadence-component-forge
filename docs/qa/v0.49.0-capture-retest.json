@@ -6,9 +6,9 @@
   "production_payload_changed_for_retest": false,
   "capture_session_count_for_four_completed_cases": 1,
   "cache_state": "warm_existing_local_resource_cache",
-  "report_status": "complete_for_recorded_scope",
-  "scope": "Installed panel search/preview/PlaceNew, official API coordinate commit, save, and independent Dbo readback; no verified physical mouse placement.",
-  "method": [
+  "report_status": "historical_warm_retest_complete_cold_followup_recorded",
+  "scope": "Four official API coordinate-commit/readback cases plus one separate human mouse placement/save/readback case; initial native crash retained as failure.",
+  "api_cases_method": [
     "Use independent test designs in one running Capture session and an existing local library cache. Initial design instances: zero for fresh cases, three for compatibility case.",
     "Invoke the real installed panel search button, result row and place button through its embedded CEF DOM.",
     "Observe the production place response after PlaceNew returns. This alone does not prove that a component was committed.",
@@ -18,6 +18,7 @@
   ],
   "timing_semantics": "Offsets are cumulative milliseconds since the scripted search click, including intentional 150 ms inter-step delays. These cached trials are not cold network latency or per-operation benchmarks.",
   "completed_api_readback_cases": 4,
+  "completed_human_mouse_cases": 1,
   "failed_instrumented_attempts": 1,
   "cases": [
     {
@@ -43,8 +44,17 @@
         "confirmed": true,
         "evidence_type": "CUA dialog observation during the initial instrumented attempt",
         "dialog_text": "This application has quit unexpectedly",
-        "fault_module": null,
-        "cause": "unknown"
+        "additional_evidence": "Cadence errorlog XML and minidump parsed offline; see v0.49.0-capture-crash-audit.json",
+        "exception_code": "0xc0000005",
+        "fault_module": "orDb_Dll64.dll",
+        "fault_module_rva": "0x253ea6",
+        "access_operation": "read",
+        "access_address": "0x0",
+        "reported_function": "DboPlacedInst::DboPlacedInst",
+        "reported_function_offset": 646,
+        "cause": "unknown",
+        "errorlog_sha256": "857e00938f300f4e7d9e9d2c682678fd987fab2fd6c75f15d843690cedda04b8",
+        "minidump_sha256": "49bfb52fb36db4ecbbf0a2dca42c880554197341bd169e07da40069a9ecb50d4"
       },
       "note": "Initial diagnostic attempt failed with a confirmed native crash after PlaceNew did not return. No independent saved placement was verified. A trace-related cause is unproven."
     },
@@ -176,6 +186,51 @@
       }
     }
   ],
+  "human_mouse_case": {
+    "id": "human_mouse_acceptance",
+    "status": "passed_human_mouse_commit_save_and_independent_readback",
+    "part_id": "C2053170",
+    "mouse_actor": "human_user",
+    "human_confirmation": "User directly reported that placement was completed in the active task.",
+    "ui_preparation": "The QA script invoked the real installed CEF search/result/place controls; the user performed the actual schematic mouse click.",
+    "baseline_instance_count": 0,
+    "observed_instance_count": 1,
+    "place_new_returned": true,
+    "native_reference_generated": "U1",
+    "observed_value": "STM32F031F6P7TR",
+    "observed_pin_count": 20,
+    "observed_pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e",
+    "coordinate_placement_api_used": false,
+    "reference_assignment_api_used": false,
+    "observer_actions": "Read instance count and properties, EndPlace after detecting the instance, then save the independent project.",
+    "independent_dbo_readback_passed": true,
+    "event_offsets_ms_from_search_start_before_manual_click": {
+      "search": 144,
+      "preview": 512,
+      "place": 1275
+    },
+    "mouse_placement_verified": true,
+    "screenshot_visual_acceptance": false,
+    "scope_limit": "One user-assisted cached placement in Capture 17.4 S039; no screenshot or broad manual interaction qualification.",
+    "evidence_sha256": {
+      "panel.json": "9d6d725eb3ec5c6b4172f4ad80e4eae419d507711106f430735f531d103ce94c",
+      "native.log": "7f7297176e44414a7fc2469c32728ced1d8df0affaae5515de7fc1b178ad98be",
+      "readback.log": "dc2454334e32a71db8732a8e28394c771cf3b2444ce93773ac7d59aadcc14da9",
+      "observe_mouse.tcl": "fb935cb710ddfb1be0e401c5e2876ca3c16a4ca0663be3b60455fb5c63dc5e8b",
+      "native_flow.tcl": "334b6525e0531a265a068a8dcb40028e05a79a15346cd23330f4730020c9eb08",
+      "driver.tcl": "ed2868ee85783ff8e5232ce39839dfd113eeb8004cc51540d802d2ee19296dcd"
+    }
+  },
+  "cold_olb_case": {
+    "status": "completed_with_failures_and_normalized_path_fix_control",
+    "report": "v0.49.1-capture-placement.json",
+    "raw_path_cold_failures": 2,
+    "normalized_path_cold_tracker_successes": 2,
+    "source_alpha0_normalized_api_save_readback_passed": true,
+    "alpha2_normalized_later_repair_path_human_save_readback_passed": true,
+    "scope": "Original and experimental numbering values both crashed with the raw path and returned with official normalization. Human commit belongs to a later repair-OLB call, not the initial alpha2 cold call. Existing warm-case totals above are unchanged."
+  },
+  "crash_audit": "v0.49.0-capture-crash-audit.json",
   "qa_callback_investigation": {
     "status": "confirmed_in_live_hosted_bridge",
     "finding": "The hosted nativeCall wrapper appends hostedClientId to Tcl commands; the QA uiPlacementReturned procedure originally accepted zero arguments. The production request procedure already accepts an optional clientId.",
@@ -208,11 +263,19 @@
     "evidence_sha256": "e637f6e4f14b7905d26d4c6c4514d2438a19ee304d9c954cde8a723fd501ee12"
   },
   "unresolved": [
-    "The initial instrumented PlaceNew attempt did not return and Capture displayed 'This application has quit unexpectedly'. The native crash is confirmed; its fault module and cause remain unknown. Later successes do not establish whether traces, UI/modal state, or another native factor caused it.",
-    "The desktop screenshot and mouse-input channels remain unavailable; physical mouse placement has not been verified. Keyboard Escape did work during this retest.",
+    "The historical instrumented crash remains recorded with a null read in orDb_Dll64.dll at RVA 0x253ea6. Subsequent untraced cold-build controls reproduced crashes and isolated official OLB path normalization as an effective correction on this host; see v0.49.1-capture-placement.json. Cadence internal object-management details remain unproven.",
+    "The automation screenshot and mouse-input channels remain unavailable. The human user completed one actual mouse placement, verified by instance observation and independent saved readback; no screenshot visual acceptance is claimed. Keyboard Escape did work during retesting.",
     "The separate Allegro stability result remains 8 successes and 2 failures in 10 trials; this Capture retest does not resolve those failures.",
     "Only one local Capture 17.4 S039 installation is covered; 17.2 and clean customer machines are not covered."
   ],
-  "release_decision": "Keep v0.49.0 as prerelease until remaining native stability and interactive acceptance gaps are closed.",
-  "privacy": "Local usernames, absolute paths and process IDs are omitted. Evidence hashes identify retained local logs; supplier CAD files are not redistributed."
+  "release_decision": "Keep the historical v0.49.0 prerelease and failures unchanged. v0.49.1 cold controls and final installed production acceptance passed on the recorded Capture 17.4 host; the new version remains prerelease because PCB stability, other versions and clean-customer qualification remain limited.",
+  "privacy": "Local usernames, absolute paths and process IDs are omitted. Evidence hashes identify retained local logs; supplier CAD files are not redistributed.",
+  "final_deployment_followup": {
+    "report": "v0.49.1-capture-placement.json",
+    "release_id": "0.49.1-94bc97f4592d",
+    "installation_and_fresh_host_production_acceptance": "passed",
+    "saved_api_reference": "U?",
+    "new_mouse_acceptance_claimed": false,
+    "prerelease_retained": true
+  }
 }
