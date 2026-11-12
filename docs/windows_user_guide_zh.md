@@ -1,6 +1,6 @@
 # JLC/LCSC Cadence 扩展 Windows 使用说明
 
-版本：0.49.0。安装程序包含 Python、转换依赖和界面资源，使用者不需要另装
+版本：0.49.1（预发布）。安装程序包含 Python、转换依赖和界面资源，使用者不需要另装
 Python、Node.js 或 Codex。Cadence Capture 和 Allegro 需要自行安装。
 
 当前已发现并实测 Cadence 17.4；安装程序支持选择 17.2 和 17.4，
@@ -8,7 +8,7 @@ Python、Node.js 或 Codex。Cadence Capture 和 Allegro 需要自行安装。
 
 ## 安装与打开
 
-1. 运行发布包中的 `JLC2Cadence-0.49.0-Setup.exe`。
+1. 从 [v0.49.1 Release](https://github.com/BH4ME/cadence-component-forge/releases/tag/v0.49.1) 下载并运行 `JLC2Cadence-0.49.1-Setup.exe`。
 2. 选择已安装的 Cadence 根目录，例如 `C:\Cadence\SPB_17.4`。
    程序检查实际可执行文件版本，不会将缺少的 17.2 自动替换成 17.4。
 3. 选择元件库保存目录。安装程序不需要打开、修改或保存现有工程。
@@ -134,7 +134,7 @@ Capture 中打开 `JLC/LCSC → Check for Updates...`，或点击内嵌页面的
 ## 测试记录如何阅读
 
 旧版完整 478 分类记录在 仓库外的独立分类验收目录。
-0.49.0 修复和验收结果见 [发布说明](releases/v0.49.0.md)。
+0.49.1 首次建库后的放置修复、安装和验收结果见 [发布说明](releases/v0.49.1.md)及 [Capture 验证记录](qa/v0.49.1-capture-placement.md)。较早的元件及 PCB 记录见 [0.49.0 发布说明](releases/v0.49.0.md)。
 
 如果手动启动 PCB 正常，而脚本启动失败，应先核对启动时选择的产品，而不是仅根据一次失败认定无 PCB 许可。独立验收工具支持显式 `--product`，生成的 STEP 映射脚本支持可选 `-Product`；参数应采用本机正常可用产品的官方名称。具体用法见 [原生 PCB 验收说明](../tools/acceptance/README.md)。
 0.47.0 的历史验收保留在独立发布验收记录，
