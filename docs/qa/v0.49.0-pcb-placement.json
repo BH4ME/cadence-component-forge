@@ -15,7 +15,7 @@
   "stability_status": "unresolved_native_intermittent_failure",
   "limitations": [
     "The initial final-library FPC placement returned nil and native exit 0xC0000005.",
-    "An uppercase C11255 run placed/saved successfully, but process exit timed out after 90 seconds; it remains a failed run.",
+    "An uppercase C11255 run placed/saved successfully, but waiting for batch completion or captured-output EOF timed out after 90 seconds; it remains a failed run. Its journal records exit. The runner did not capture process state at timeout, so a still-running main process is not established.",
     "A second forced-uppercase run passed all phases; filename case is not an established failure cause.",
     "No source changes were made between failed and successful repeats. Failures are not suppressed by retries.",
     "Pin centers, numbers, padstack names, and STEP metadata were compared. This is not full 3D fit or DRC design qualification.",
@@ -137,7 +137,7 @@
       "requested_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
       "native_footprint": "C11255_RES_TH_BD3_0_L9_49041e03",
       "comparison": null,
-      "error": "Native place process did not exit within 90 seconds after saving the independent board.",
+      "error": "Batch completion or captured-output EOF wait exceeded 90 seconds after saving the independent board; main-process state at timeout was not recorded.",
       "source_files_still_unchanged": true
     },
     {

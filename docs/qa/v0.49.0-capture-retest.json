@@ -1,0 +1,218 @@
+{
+  "version": "0.49.0",
+  "date": "2026-11-12",
+  "environment": "Windows x64 / Capture 17.4 S039",
+  "installed_payload_id": "0.49.0-3a2c3f5def8e",
+  "production_payload_changed_for_retest": false,
+  "capture_session_count_for_four_completed_cases": 1,
+  "cache_state": "warm_existing_local_resource_cache",
+  "report_status": "complete_for_recorded_scope",
+  "scope": "Installed panel search/preview/PlaceNew, official API coordinate commit, save, and independent Dbo readback; no verified physical mouse placement.",
+  "method": [
+    "Use independent test designs in one running Capture session and an existing local library cache. Initial design instances: zero for fresh cases, three for compatibility case.",
+    "Invoke the real installed panel search button, result row and place button through its embedded CEF DOM.",
+    "Observe the production place response after PlaceNew returns. This alone does not prove that a component was committed.",
+    "The test harness cancels interactive placement and calls official PlacePart at a fixed coordinate, assigns the new unique reference, then saves.",
+    "A separate Dbo session reopens the saved DSN and OLB to verify count, unique references, value, all pin numbers 1-20 and PCB Footprint.",
+    "No test modifies source geometry or the installed product payload. Test-harness annotation does not validate automatic product annotation."
+  ],
+  "timing_semantics": "Offsets are cumulative milliseconds since the scripted search click, including intentional 150 ms inter-step delays. These cached trials are not cold network latency or per-operation benchmarks.",
+  "completed_api_readback_cases": 4,
+  "failed_instrumented_attempts": 1,
+  "cases": [
+    {
+      "id": "instrumented_initial",
+      "status": "failed_confirmed_native_crash",
+      "baseline_instance_count": 0,
+      "tcl_execution_trace_enabled": true,
+      "part_id": "C2053170",
+      "place_new_returned": false,
+      "official_api_commit_and_save_recorded": false,
+      "independent_dbo_readback_passed": false,
+      "observed_instances": [],
+      "event_offsets_ms_from_search_start": {
+        "search": 141,
+        "preview": 535
+      },
+      "mouse_placement_verified": false,
+      "evidence_sha256": {
+        "panel.json": "5adce28d3e1ba0268b5ce2561b882265df03aae56932f88722627ccae225f93f",
+        "native.log": "5bceaf11f61fcddfadd7c5ac60c42cf7e3cf73c19daa438f2c788ce4dc3a4098"
+      },
+      "native_crash": {
+        "confirmed": true,
+        "evidence_type": "CUA dialog observation during the initial instrumented attempt",
+        "dialog_text": "This application has quit unexpectedly",
+        "fault_module": null,
+        "cause": "unknown"
+      },
+      "note": "Initial diagnostic attempt failed with a confirmed native crash after PlaceNew did not return. No independent saved placement was verified. A trace-related cause is unproven."
+    },
+    {
+      "id": "fresh_design_1",
+      "status": "passed_api_commit_and_independent_readback",
+      "baseline_instance_count": 0,
+      "tcl_execution_trace_enabled": false,
+      "part_id": "C2053170",
+      "place_new_returned": true,
+      "official_api_commit_and_save_recorded": true,
+      "independent_dbo_readback_passed": true,
+      "observed_instances": [
+        {
+          "reference": "U1",
+          "pin_count": 20,
+          "pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e"
+        }
+      ],
+      "event_offsets_ms_from_search_start": {
+        "search": 169,
+        "preview": 535,
+        "place": 1307
+      },
+      "mouse_placement_verified": false,
+      "evidence_sha256": {
+        "panel.json": "46f537a8ae5a669bba6d43f7f1be5e35a86cd02d37f67705ae6564bbc63b826f",
+        "native.log": "bb9f10e26817d28b5f1fe2ece11abdb385d28ec65d5faaa4faa0a7c1b5a88a8d",
+        "readback.log": "dc2454334e32a71db8732a8e28394c771cf3b2444ce93773ac7d59aadcc14da9"
+      }
+    },
+    {
+      "id": "fresh_design_2",
+      "status": "passed_api_commit_and_independent_readback",
+      "baseline_instance_count": 0,
+      "tcl_execution_trace_enabled": false,
+      "part_id": "C2053170",
+      "place_new_returned": true,
+      "official_api_commit_and_save_recorded": true,
+      "independent_dbo_readback_passed": true,
+      "observed_instances": [
+        {
+          "reference": "U1",
+          "pin_count": 20,
+          "pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e"
+        }
+      ],
+      "event_offsets_ms_from_search_start": {
+        "search": 146,
+        "preview": 521,
+        "place": 1256
+      },
+      "mouse_placement_verified": false,
+      "evidence_sha256": {
+        "panel.json": "fd5ac832dbf963b6cf9a0845b14a95e13dcf92bd383f4b2295f6abffe425e2b5",
+        "native.log": "5ce3793e1f09741278b110cd99e915953fbbc422dd26ab029b557354fc97dcdf",
+        "readback.log": "dc2454334e32a71db8732a8e28394c771cf3b2444ce93773ac7d59aadcc14da9"
+      }
+    },
+    {
+      "id": "fresh_design_3",
+      "status": "passed_api_commit_and_independent_readback",
+      "baseline_instance_count": 0,
+      "tcl_execution_trace_enabled": false,
+      "part_id": "C2053170",
+      "place_new_returned": true,
+      "official_api_commit_and_save_recorded": true,
+      "independent_dbo_readback_passed": true,
+      "observed_instances": [
+        {
+          "reference": "U1",
+          "pin_count": 20,
+          "pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e"
+        }
+      ],
+      "event_offsets_ms_from_search_start": {
+        "search": 133,
+        "preview": 494,
+        "place": 1233
+      },
+      "mouse_placement_verified": false,
+      "evidence_sha256": {
+        "panel.json": "dcec8ac0af585632f837536666d7543ce34b7f27d21189a8bb7fb538f26d48f1",
+        "native.log": "c25341c7f951a3c7652f388cc63cf7a6bccdab2908a9a84ddbf2cd57098c42ed",
+        "readback.log": "dc2454334e32a71db8732a8e28394c771cf3b2444ce93773ac7d59aadcc14da9"
+      }
+    },
+    {
+      "id": "existing_design_compatibility",
+      "status": "passed_api_commit_and_independent_readback",
+      "baseline_instance_count": 3,
+      "tcl_execution_trace_enabled": false,
+      "part_id": "C2053170",
+      "place_new_returned": true,
+      "official_api_commit_and_save_recorded": true,
+      "independent_dbo_readback_passed": true,
+      "observed_instances": [
+        {
+          "reference": "U1",
+          "pin_count": 20,
+          "pcb_footprint": "C2053170_TSSOP_20_L6_5_f2bd621e"
+        },
+        {
+          "reference": "U3",
+          "pin_count": 20,
+          "pcb_footprint": "C2053170_TSSOP_20_L6_5_f2bd621e"
+        },
+        {
+          "reference": "U2",
+          "pin_count": 20,
+          "pcb_footprint": "C2053170_TSSOP_20_L6_5_f2bd621e"
+        },
+        {
+          "reference": "U4",
+          "pin_count": 20,
+          "pcb_footprint": "c2053170_tssop_20_l6_5_f2bd621e"
+        }
+      ],
+      "event_offsets_ms_from_search_start": {
+        "search": 150,
+        "preview": 538,
+        "place": 1306
+      },
+      "mouse_placement_verified": false,
+      "evidence_sha256": {
+        "panel.json": "111f253d789b53396a034949795e47508ad8a198a95fe663b964e88336c3b3c1",
+        "native.log": "3eda134f3e000eb07e2281147402fc924d607354a9c80d8ec7c0654e1f937175",
+        "readback.log": "aad2594dae4d2d98bb1718fbd92c87d7af8c9f58331770b466074411043b62c2"
+      }
+    }
+  ],
+  "qa_callback_investigation": {
+    "status": "confirmed_in_live_hosted_bridge",
+    "finding": "The hosted nativeCall wrapper appends hostedClientId to Tcl commands; the QA uiPlacementReturned procedure originally accepted zero arguments. The production request procedure already accepts an optional clientId.",
+    "effect_observed": "The automatic QA commit callback was not recorded after a successful product place response. An external replay driver completed the official API commit.",
+    "live_verification": "Changing only the QA callback to accept args recorded ui_place_returned=1 and hosted_client_argument_count=1 in the compatibility case.",
+    "production_fix_required": false,
+    "root_cause_boundary": "This confirms the QA callback parameter mismatch. It does not explain the earlier PlaceNew non-return or prove any native crash cause."
+  },
+  "readonly_olb_comparison": {
+    "native_package_device_part_pin_audit_identical": true,
+    "old_sha256": "10e2e7b703cc5bd3786a7260af52541d5a2cb30b0309f7f24a1a85b77bc89a37",
+    "new_sha256": "1a4e60208cc72be93530c92c9ac9c8318dcc3dc18874ab0e9a1a9c191b6fd755",
+    "bytes_each": 51712,
+    "pin_count": 20,
+    "xml_equal_after_normalizing_known_differences": true,
+    "normalized_differences": [
+      "export source pathname",
+      "package timestamp",
+      "PCB Footprint case in three properties"
+    ],
+    "source_files_unchanged_after_reads": true,
+    "limitation": "Not every binary difference is exposed by XML. This does not establish the earlier stalled/crashed session's cause or validate every live design-cache state."
+  },
+  "original_project_protection": {
+    "project_count": 2,
+    "opj_dsn_files_checked": 4,
+    "unchanged_files": 4,
+    "algorithm": "SHA-256",
+    "all_unchanged": true,
+    "evidence_sha256": "e637f6e4f14b7905d26d4c6c4514d2438a19ee304d9c954cde8a723fd501ee12"
+  },
+  "unresolved": [
+    "The initial instrumented PlaceNew attempt did not return and Capture displayed 'This application has quit unexpectedly'. The native crash is confirmed; its fault module and cause remain unknown. Later successes do not establish whether traces, UI/modal state, or another native factor caused it.",
+    "The desktop screenshot and mouse-input channels remain unavailable; physical mouse placement has not been verified. Keyboard Escape did work during this retest.",
+    "The separate Allegro stability result remains 8 successes and 2 failures in 10 trials; this Capture retest does not resolve those failures.",
+    "Only one local Capture 17.4 S039 installation is covered; 17.2 and clean customer machines are not covered."
+  ],
+  "release_decision": "Keep v0.49.0 as prerelease until remaining native stability and interactive acceptance gaps are closed.",
+  "privacy": "Local usernames, absolute paths and process IDs are omitted. Evidence hashes identify retained local logs; supplier CAD files are not redistributed."
+}
